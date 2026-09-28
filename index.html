@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LexiLearn — Learn a language, one lesson at a time</title>
+<style>
+/* ===================================================================
+   LexiLearn — stylesheet
+   Palette: deep navy primary, soft blue secondary, white base, rounded
+   cards, subtle gradients. Dark mode via [data-theme="dark"] on <html>.
+   =================================================================== */
+
+:root{
+  --navy-900:#0a1b33;
+  --navy-800:#12294a;
+  --navy-700:#1a3560;
+  --blue-500:#3f7de0;
+  --blue-400:#5b93ef;
+  --blue-100:#e7f0ff;
+  --bg:#ffffff;
+  --surface:#f5f8fc;
+  --surface-2:#eef3fa;
+  --border:#e1e8f2;
+  --text:#152238;
+  --text-muted:#5b6b85;
+  --success:#1f9d63;
+  --error:#d1453b;
+  --warning:#d9932b;
+  --radius-sm:10px;
+  --radius-md:16px;
+  --radius-lg:24px;
+  --shadow:0 6px 20px rgba(10,27,51,.08);
+  --shadow-sm:0 2px 8px rgba(10,27,51,.06);
+  --font: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --transition:.18s ease;
+}
+
+[data-theme="dark"]{
+  --bg:#0b1526;
+  --surface:#101f36;
+  --surface-2:#152743;
+  --border:#22375a;
+  --text:#eaf1fb;
+  --text-muted:#9bb0cc;
+  --blue-100:#152a4a;
+  --shadow:0 6px 24px rgba(0,0,0,.45);
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font);
+  color:var(--text);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  line-height:1.5;
+}
+h1,h2,h3,h4{margin:0 0 .4em;font-weight:700;letter-spacing:-.01em;color:var(--text);}
+p{margin:0 0 1em;color:var(--text-muted);}
+button{font-family:inherit;cursor:pointer;}
+input{font-family:inherit;}
+a{color:var(--blue-500);}
+::selection{background:var(--blue-400);color:#fff;}
+
+.screen{display:none;}
+.screen.active{display:block;}
+
+.toast-box{position:fixed;top:1em;right:1em;z-index:200;display:flex;flex-direction:column;max-width:320px;}
+
+/* ---------- buttons ---------- */
+.btn{
+  border:none;border-radius:var(--radius-sm);
+  padding:.75em 1.4em;font-size:.95rem;font-weight:600;
+  transition:transform var(--transition), box-shadow var(--transition), background var(--transition);
+  display:inline-flex;align-items:center;justify-content:center;gap:.4em;
+}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:linear-gradient(135deg,var(--navy-800),var(--blue-500));color:#fff;box-shadow:var(--shadow-sm);}
+.btn-primary:hover{box-shadow:0 8px 22px rgba(63,125,224,.35);}
+.btn-outline{background:transparent;border:1.5px solid var(--navy-800);color:var(--navy-800);}
+[data-theme="dark"] .btn-outline{border-color:var(--blue-400);color:var(--blue-400);}
+.btn-outline:hover{background:var(--surface-2);}
+.btn-ghost{background:transparent;color:var(--text);}
+.btn-ghost:hover{background:var(--surface-2);}
+.btn-lg{padding:.9em 1.8em;font-size:1.05rem;border-radius:var(--radius-md);}
+.btn-block{width:100%;}
+.btn-danger{background:var(--error);color:#fff;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* ---------- landing header/hero ---------- */
+.site-header{display:flex;align-items:center;justify-content:space-between;padding:1.2em 5%;}
+.brand{font-weight:800;font-size:1.3rem;color:var(--navy-900);display:flex;align-items:center;gap:.4em;}
+[data-theme="dark"] .brand{color:var(--text);}
+.brand-mark{background:linear-gradient(135deg,var(--navy-800),var(--blue-500));color:#fff;border-radius:8px;padding:.15em .5em;font-size:.9em;}
+.brand.center{justify-content:center;margin-bottom:1em;font-size:1.4rem;}
+.brand.small{padding:0 0 1em;font-size:1.1rem;}
+.site-header-actions{display:flex;gap:.6em;}
+
+.hero{display:flex;align-items:center;gap:3em;padding:2em 5% 4em;flex-wrap:wrap;}
+.hero-copy{flex:1 1 420px;}
+.hero-tag{color:var(--blue-500);font-weight:700;margin-bottom:.6em;}
+.hero h1{font-size:2.6rem;line-height:1.15;max-width:14ch;}
+.hero-sub{font-size:1.05rem;max-width:48ch;}
+.hero-actions{display:flex;gap:.8em;margin-top:1.2em;flex-wrap:wrap;}
+
+.hero-mock{flex:1 1 320px;display:flex;justify-content:center;}
+.mock-card{
+  background:linear-gradient(160deg,var(--navy-900),var(--navy-700));
+  color:#fff;border-radius:var(--radius-lg);padding:1.6em;width:100%;max-width:340px;
+  box-shadow:var(--shadow);
+}
+.mock-row{display:flex;justify-content:space-between;align-items:center;font-weight:600;margin-bottom:.3em;}
+.mock-flame{background:rgba(255,255,255,.12);padding:.2em .6em;border-radius:20px;font-size:.85rem;}
+.mock-lang{color:#bcd3ff;font-size:.9rem;margin-bottom:.6em;}
+.mock-bar{background:rgba(255,255,255,.18);height:8px;border-radius:6px;overflow:hidden;}
+.mock-bar-fill{background:linear-gradient(90deg,var(--blue-400),#8fd3ff);height:100%;}
+.mock-sub{font-size:.75rem;color:#9fb7e0;margin:.4em 0 1em;}
+.mock-tile{background:rgba(255,255,255,.08);border-radius:var(--radius-sm);padding:.9em;font-size:.85rem;margin-bottom:1em;}
+.mock-stats{display:flex;justify-content:space-between;text-align:center;}
+.mock-stats div{display:flex;flex-direction:column;font-size:.8rem;color:#9fb7e0;}
+.mock-stats strong{font-size:1.1rem;color:#fff;}
+
+.section-block{padding:3em 5%;}
+.section-block.alt{background:var(--surface);}
+.section-block h2{text-align:center;margin-bottom:1em;font-size:1.7rem;}
+
+.lang-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.2em;}
+.lang-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
+  padding:1.4em;text-align:left;transition:transform var(--transition), box-shadow var(--transition);
+  cursor:pointer;position:relative;overflow:hidden;
+}
+.lang-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
+.lang-card .native{font-size:1.6rem;font-weight:700;}
+.lang-card .eng-name{font-weight:600;color:var(--text-muted);margin-bottom:.5em;}
+.lang-card .lang-desc{font-size:.85rem;}
+.lang-card .lang-diff{display:inline-block;font-size:.75rem;font-weight:700;padding:.2em .6em;border-radius:20px;background:var(--blue-100);color:var(--navy-800);margin-bottom:.5em;}
+.lang-accent{position:absolute;top:0;left:0;right:0;height:5px;}
+
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.2em;max-width:1100px;margin:0 auto;}
+.feature{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.4em;}
+[data-theme="dark"] .feature{background:var(--surface);}
+
+.how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5em;max-width:1100px;margin:0 auto;}
+.how-step{text-align:center;}
+.how-num{width:2.4em;height:2.4em;border-radius:50%;background:linear-gradient(135deg,var(--navy-800),var(--blue-500));color:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto .5em;font-weight:700;}
+
+.site-footer{padding:2em 5%;text-align:center;color:var(--text-muted);font-size:.85rem;border-top:1px solid var(--border);}
+
+/* ---------- auth ---------- */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--surface);padding:2em;}
+.auth-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2.2em;width:100%;max-width:400px;box-shadow:var(--shadow);}
+.auth-demo-note{font-size:.8rem;background:var(--blue-100);color:var(--navy-800);padding:.7em;border-radius:var(--radius-sm);text-align:center;}
+.auth-tabs{display:flex;background:var(--surface-2);border-radius:var(--radius-sm);padding:.25em;margin-bottom:1.2em;}
+.auth-tab{flex:1;background:none;border:none;padding:.6em;border-radius:8px;font-weight:600;color:var(--text-muted);}
+.auth-tab.active{background:var(--bg);color:var(--navy-800);box-shadow:var(--shadow-sm);}
+[data-theme="dark"] .auth-tab.active{color:var(--text);}
+.auth-form{display:none;flex-direction:column;gap:.9em;}
+.auth-form.active{display:flex;}
+.auth-form label{font-size:.85rem;font-weight:600;color:var(--text-muted);display:flex;flex-direction:column;gap:.35em;}
+.auth-form input{padding:.7em .8em;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.95rem;background:var(--bg);color:var(--text);}
+.auth-form input:focus{outline:2px solid var(--blue-400);outline-offset:1px;}
+.pw-wrap{display:flex;gap:.4em;}
+.pw-wrap input{flex:1;}
+.pw-toggle{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 .8em;font-size:.8rem;font-weight:600;}
+.remember{flex-direction:row !important;align-items:center;gap:.5em !important;}
+.form-error{color:var(--error);font-size:.82rem;min-height:1em;}
+.auth-card .btn{margin-top:.3em;}
+
+/* ---------- app shell ---------- */
+.app-shell{display:none;}
+.app-shell.active{display:flex;min-height:100vh;}
+.sidebar{
+  width:230px;flex-shrink:0;background:var(--navy-900);color:#fff;padding:1.4em 1em;
+  display:flex;flex-direction:column;gap:.3em;position:sticky;top:0;height:100vh;
+}
+.sidebar .brand{color:#fff;}
+.nav-item{background:none;border:none;color:#c8d6ee;text-align:left;padding:.7em .8em;border-radius:var(--radius-sm);font-size:.92rem;font-weight:500;transition:background var(--transition),color var(--transition);}
+.nav-item:hover{background:rgba(255,255,255,.08);color:#fff;}
+.nav-item.active{background:var(--blue-500);color:#fff;}
+.nav-item.logout{margin-top:auto;color:#ffb3ac;}
+.app-main{flex:1;min-width:0;padding:1.6em 2.2em 4em;}
+.topbar{display:flex;align-items:center;gap:1em;margin-bottom:1.6em;}
+.hamburger{display:none;background:none;border:none;font-size:1.4rem;}
+.search-wrap{position:relative;flex:1;max-width:420px;}
+.search-wrap input{width:100%;padding:.6em .9em;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);}
+.search-results{position:absolute;top:110%;left:0;right:0;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow);max-height:320px;overflow:auto;z-index:20;display:none;}
+.search-results.active{display:block;}
+.search-result-item{padding:.6em .9em;border-bottom:1px solid var(--border);font-size:.88rem;}
+.search-result-item b{color:var(--navy-800);}
+[data-theme="dark"] .search-result-item b{color:var(--blue-400);}
+.topbar-lang{font-weight:700;color:var(--navy-800);white-space:nowrap;}
+[data-theme="dark"] .topbar-lang{color:var(--blue-400);}
+.app-screen{display:none;animation:fadeIn .25s ease;}
+.app-screen.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--navy-900);padding:.5em 0;justify-content:space-around;z-index:30;}
+.bottom-nav button{background:none;border:none;font-size:1.3rem;color:#c8d6ee;padding:.3em .6em;border-radius:8px;}
+.bottom-nav button.active{color:#fff;background:rgba(255,255,255,.12);}
+
+/* ---------- cards / dashboard ---------- */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.4em;}
+.grid-2{display:grid;grid-template-columns:2fr 1fr;gap:1.2em;}
+.grid-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.2em;}
+.stat-tile{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.1em;text-align:center;}
+.stat-tile strong{display:block;font-size:1.5rem;color:var(--navy-800);}
+[data-theme="dark"] .stat-tile strong{color:var(--blue-400);}
+.stat-tile span{font-size:.8rem;color:var(--text-muted);}
+
+.dash-hero{background:linear-gradient(135deg,var(--navy-900),var(--navy-700));color:#fff;border-radius:var(--radius-lg);padding:1.8em;margin-bottom:1.4em;}
+.dash-hero h2{color:#fff;}
+.dash-hero .streak-pill{background:rgba(255,255,255,.15);padding:.3em .8em;border-radius:20px;font-weight:700;display:inline-block;margin-bottom:.6em;}
+.progress-bar{background:rgba(0,0,0,.08);border-radius:8px;height:10px;overflow:hidden;margin:.4em 0;}
+[data-theme="dark"] .progress-bar{background:rgba(255,255,255,.1);}
+.progress-bar-fill{background:linear-gradient(90deg,var(--blue-500),var(--blue-400));height:100%;border-radius:8px;transition:width .5s ease;}
+.dash-hero .progress-bar{background:rgba(255,255,255,.18);}
+.dash-hero .progress-bar-fill{background:linear-gradient(90deg,#8fd3ff,#fff);}
+
+.continue-card{display:flex;justify-content:space-between;align-items:center;gap:1em;flex-wrap:wrap;}
+.continue-card .lesson-name{font-size:1.2rem;font-weight:700;}
+
+.chapter-block{margin-bottom:1.6em;}
+.chapter-title{font-size:1.15rem;font-weight:700;margin-bottom:.6em;}
+.lesson-list{display:flex;flex-direction:column;gap:.5em;}
+.lesson-row{
+  display:flex;align-items:center;gap:.8em;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:.8em 1em;transition:background var(--transition);
+}
+.lesson-row.clickable:hover{background:var(--surface-2);}
+.lesson-row.locked{opacity:.55;}
+.lesson-dot{width:1.8em;height:1.8em;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;}
+.lesson-row.done .lesson-dot{background:var(--success);color:#fff;}
+.lesson-row.current .lesson-dot{background:var(--blue-500);color:#fff;}
+.lesson-info{flex:1;}
+.lesson-info .t{font-weight:600;}
+.lesson-info .s{font-size:.8rem;color:var(--text-muted);}
+
+/* ---------- lesson stages ---------- */
+.lesson-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.6em;margin-bottom:1em;}
+.lesson-crumbs{font-size:.85rem;color:var(--text-muted);}
+.stage-progress{display:flex;gap:.3em;margin-bottom:1.4em;}
+.stage-dot{flex:1;height:6px;border-radius:4px;background:var(--border);}
+.stage-dot.done{background:var(--blue-500);}
+.stage-dot.active{background:var(--navy-800);}
+
+.vocab-teach-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.4em;margin-bottom:1em;}
+.vocab-teach-card .word{font-size:1.6rem;font-weight:700;color:var(--navy-800);}
+[data-theme="dark"] .vocab-teach-card .word{color:var(--blue-400);}
+.vocab-teach-card .translation{font-weight:600;margin:.2em 0 .3em;}
+.vocab-teach-card .pron{font-size:.85rem;color:var(--text-muted);}
+.vocab-teach-card .example{font-size:.85rem;font-style:italic;margin-top:.5em;}
+.speak-btn{background:var(--blue-100);border:none;color:var(--navy-800);border-radius:50%;width:2.4em;height:2.4em;font-size:1rem;flex-shrink:0;}
+[data-theme="dark"] .speak-btn{background:var(--surface-2);color:var(--blue-400);}
+.rtl-word{direction:rtl;font-size:2.2rem;}
+
+.option-list{display:flex;flex-direction:column;gap:.6em;margin:1em 0;}
+.option-item{
+  text-align:left;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  padding:.8em 1em;font-size:.95rem;transition:border-color var(--transition), background var(--transition);
+}
+.option-item:hover:not(:disabled){border-color:var(--blue-400);}
+.option-item.correct{border-color:var(--success);background:rgba(31,157,99,.1);}
+.option-item.incorrect{border-color:var(--error);background:rgba(209,69,59,.1);}
+.option-item:disabled{cursor:default;}
+
+.sentence-bank{display:flex;flex-wrap:wrap;gap:.5em;margin:1em 0;min-height:2.4em;padding:.8em;background:var(--surface-2);border-radius:var(--radius-sm);}
+.sentence-chosen{display:flex;flex-wrap:wrap;gap:.5em;margin:1em 0;min-height:2.6em;padding:.8em;border:1.5px dashed var(--border);border-radius:var(--radius-sm);}
+.word-chip{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.4em .9em;font-weight:600;}
+.word-chip.picked{opacity:.4;}
+.word-chip.placed{background:var(--blue-100);border-color:var(--blue-400);}
+
+.explain-box{background:var(--blue-100);border-radius:var(--radius-sm);padding:1em;font-size:.9rem;margin-top:.8em;}
+[data-theme="dark"] .explain-box{background:var(--surface-2);}
+.explain-box.wrong{background:rgba(209,69,59,.12);}
+.explain-box.right{background:rgba(31,157,99,.12);}
+
+.lesson-actions{display:flex;justify-content:space-between;margin-top:1.4em;}
+
+.xp-float{position:fixed;font-weight:800;color:var(--success);font-size:1.3rem;pointer-events:none;z-index:80;animation:floatUp 1s ease forwards;}
+@keyframes floatUp{from{opacity:1;transform:translateY(0);}to{opacity:0;transform:translateY(-40px);}}
+
+/* ---------- flashcards / vocab ---------- */
+.vocab-filters{display:flex;gap:.5em;flex-wrap:wrap;margin-bottom:1.2em;}
+.chip-filter{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:.4em 1em;font-size:.85rem;font-weight:600;}
+.chip-filter.active{background:var(--navy-800);color:#fff;border-color:var(--navy-800);}
+.flash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1em;}
+.flashcard{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
+  padding:1.2em;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;
+}
+.flashcard .front{font-size:1.3rem;font-weight:700;}
+.flashcard .back{display:none;font-size:.95rem;color:var(--text-muted);margin-top:.4em;}
+.flashcard.flipped .back{display:block;}
+.flash-actions{display:flex;gap:.5em;margin-top:.8em;}
+.flash-actions button{flex:1;border-radius:var(--radius-sm);padding:.4em;font-size:.8rem;border:1px solid var(--border);background:var(--bg);}
+.flash-actions .easy{color:var(--success);}
+.flash-actions .hard{color:var(--error);}
+
+/* ---------- achievements ---------- */
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.1em;}
+.ach-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.2em;text-align:center;opacity:.45;}
+.ach-card.unlocked{opacity:1;box-shadow:var(--shadow-sm);border-color:var(--blue-400);}
+.ach-icon{font-size:2rem;margin-bottom:.3em;}
+.ach-card h4{margin-bottom:.2em;}
+.ach-card p{font-size:.82rem;margin:0;}
+
+/* ---------- misc ---------- */
+.badge{display:inline-block;font-size:.7rem;font-weight:700;padding:.2em .6em;border-radius:20px;background:var(--blue-100);color:var(--navy-800);}
+[data-theme="dark"] .badge{color:var(--blue-400);}
+.settings-row{display:flex;justify-content:space-between;align-items:center;padding:.9em 0;border-bottom:1px solid var(--border);}
+.settings-row:last-child{border-bottom:none;}
+.switch{position:relative;width:44px;height:24px;background:var(--border);border-radius:20px;border:none;flex-shrink:0;}
+.switch.on{background:var(--blue-500);}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform var(--transition);}
+.switch.on::after{transform:translateX(20px);}
+
+.result-big{font-size:2.4rem;font-weight:800;color:var(--navy-800);text-align:center;}
+[data-theme="dark"] .result-big{color:var(--blue-400);}
+.result-pct{text-align:center;color:var(--text-muted);margin-bottom:1em;}
+.mistake-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.8em 1em;margin-bottom:.5em;}
+
+.confetti{position:fixed;top:-10px;width:8px;height:14px;z-index:90;animation:confettiFall 2.2s linear forwards;}
+@keyframes confettiFall{to{transform:translateY(105vh) rotate(360deg);opacity:.3;}}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
+}
+html.no-anim *{animation:none !important;transition:none !important;}
+
+/* ---------- responsive ---------- */
+@media (max-width:900px){
+  .grid-2{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .hamburger{display:inline-block;}
+  .bottom-nav{display:flex;}
+  .app-main{padding:1.2em 1.2em 5em;}
+  .hero{padding:1.5em 5% 2.5em;text-align:center;justify-content:center;}
+  .hero-actions{justify-content:center;}
+  .hero h1{max-width:100%;}
+}
+@media (max-width:900px){
+  .sidebar.mobile-open{
+    display:flex;position:fixed;left:0;top:0;bottom:0;z-index:50;box-shadow:0 0 30px rgba(0,0,0,.3);
+  }
+}
+@media (max-width:520px){
+  .site-header{padding:1em 4%;}
+  .hero h1{font-size:2rem;}
+  .auth-card{padding:1.5em;}
+}
+
+</style>
+</head>
+<body>
+
+<!-- TOASTS -->
+<div id="toastBox" class="toast-box" aria-live="polite"></div>
+
+<!-- ===================== LANDING ===================== -->
+<section id="screen-landing" class="screen active">
+  <header class="site-header">
+    <div class="brand"><span class="brand-mark">Lx</span> LexiLearn</div>
+    <div class="site-header-actions">
+      <button class="btn btn-ghost" data-nav="auth-login">Log In</button>
+      <button class="btn btn-primary" data-nav="auth-signup">Start Learning</button>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="hero-copy">
+      <p class="hero-tag">“Learn a language. One lesson at a time.”</p>
+      <h1>Learn a new language without feeling overwhelmed.</h1>
+      <p class="hero-sub">Build real vocabulary, understand grammar, practice pronunciation, and test yourself as you progress.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary btn-lg" data-nav="auth-signup">Start Learning</button>
+        <button class="btn btn-outline btn-lg" id="btnTryDemo">Try Demo</button>
+      </div>
+    </div>
+    <div class="hero-mock" aria-hidden="true">
+      <div class="mock-card">
+        <div class="mock-row"><span>Good evening, Alex</span><span class="mock-flame">🔥 7</span></div>
+        <div class="mock-lang">Italian · Level 3</div>
+        <div class="mock-bar"><div class="mock-bar-fill" style="width:82%"></div></div>
+        <div class="mock-sub">82% to next level</div>
+        <div class="mock-tile">Chapter 2 · Lesson 4<br><strong>Ordering Food</strong></div>
+        <div class="mock-stats">
+          <div><strong>16</strong><span>Lessons</span></div>
+          <div><strong>143</strong><span>Words</span></div>
+          <div><strong>87%</strong><span>Accuracy</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <h2>Choose your language</h2>
+    <div class="lang-grid" id="landingLangGrid"></div>
+  </div>
+
+  <div class="section-block alt">
+    <h2>Everything you need to actually learn</h2>
+    <div class="feature-grid">
+      <div class="feature"><h3>Structured lessons</h3><p>Vocabulary, grammar, pronunciation and sentence-building in every lesson — not just flashcards.</p></div>
+      <div class="feature"><h3>Real feedback</h3><p>Quizzes and chapter exams with randomized questions so review always feels fresh.</p></div>
+      <div class="feature"><h3>Streaks & XP</h3><p>Daily challenges, streak tracking, and levels keep you coming back.</p></div>
+      <div class="feature"><h3>Mistake review</h3><p>LexiLearn remembers what tripped you up and brings it back until it sticks.</p></div>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <h2>How LexiLearn works</h2>
+    <div class="how-grid">
+      <div class="how-step"><div class="how-num">1</div><h3>Pick a language</h3><p>Arabic, Japanese, German, Romanian or Italian.</p></div>
+      <div class="how-step"><div class="how-num">2</div><h3>Work through lessons</h3><p>Learn, understand, practice, and build sentences step by step.</p></div>
+      <div class="how-step"><div class="how-num">3</div><h3>Test yourself</h3><p>Quizzes after every lesson, exams after every chapter.</p></div>
+      <div class="how-step"><div class="how-num">4</div><h3>Track progress</h3><p>XP, streaks, achievements and stats keep you motivated.</p></div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div>LexiLearn — a local, browser-only demo. No account data ever leaves your device.</div>
+  </footer>
+</section>
+
+<!-- ===================== AUTH ===================== -->
+<section id="screen-auth" class="screen">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="brand center"><span class="brand-mark">Lx</span> LexiLearn</div>
+      <p class="auth-demo-note">This is a local demo account system — everything is stored only in your browser (localStorage). No passwords are ever sent anywhere.</p>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Log In</button>
+        <button class="auth-tab" data-tab="signup">Sign Up</button>
+      </div>
+
+      <form id="loginForm" class="auth-form active">
+        <label>Username or Email
+          <input type="text" id="loginId" required autocomplete="username">
+        </label>
+        <label>Password
+          <span class="pw-wrap">
+            <input type="password" id="loginPw" required autocomplete="current-password">
+            <button type="button" class="pw-toggle" data-target="loginPw">Show</button>
+          </span>
+        </label>
+        <label class="remember"><input type="checkbox" id="loginRemember" checked> Remember me</label>
+        <div class="form-error" id="loginError"></div>
+        <button type="submit" class="btn btn-primary btn-block">Log In</button>
+      </form>
+
+      <form id="signupForm" class="auth-form">
+        <label>Username
+          <input type="text" id="suUsername" required minlength="3">
+        </label>
+        <label>Email
+          <input type="email" id="suEmail" required>
+        </label>
+        <label>Password
+          <span class="pw-wrap">
+            <input type="password" id="suPassword" required minlength="4">
+            <button type="button" class="pw-toggle" data-target="suPassword">Show</button>
+          </span>
+        </label>
+        <div class="form-error" id="signupError"></div>
+        <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+      </form>
+
+      <button class="btn btn-outline btn-block" id="btnTryDemo2">Try Demo Instead</button>
+      <button class="btn btn-ghost btn-block" data-nav="landing">← Back to home</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== APP SHELL (post-login) ===================== -->
+<div id="appShell" class="app-shell">
+  <nav class="sidebar" id="sidebar">
+    <div class="brand small"><span class="brand-mark">Lx</span> LexiLearn</div>
+    <button class="nav-item" data-app-nav="dashboard">🏠 Home</button>
+    <button class="nav-item" data-app-nav="path">📘 Learn</button>
+    <button class="nav-item" data-app-nav="review">🔁 Review</button>
+    <button class="nav-item" data-app-nav="vocab">🗂 Vocabulary</button>
+    <button class="nav-item" data-app-nav="quizzes">📝 Quizzes</button>
+    <button class="nav-item" data-app-nav="achievements">🏆 Achievements</button>
+    <button class="nav-item" data-app-nav="statistics">📊 Statistics</button>
+    <button class="nav-item" data-app-nav="profile">👤 Profile</button>
+    <button class="nav-item" data-app-nav="settings">⚙️ Settings</button>
+    <button class="nav-item logout" id="btnLogout">🚪 Log Out</button>
+  </nav>
+
+  <main class="app-main">
+    <div class="topbar">
+      <button class="hamburger" id="hamburgerBtn" aria-label="Menu">☰</button>
+      <div class="search-wrap">
+        <input type="text" id="searchInput" placeholder="Search words, lessons, grammar…">
+        <div id="searchResults" class="search-results"></div>
+      </div>
+      <div class="topbar-lang" id="topbarLang"></div>
+    </div>
+
+    <div id="app-language" class="app-screen"></div>
+    <div id="app-dashboard" class="app-screen"></div>
+    <div id="app-path" class="app-screen"></div>
+    <div id="app-lesson" class="app-screen"></div>
+    <div id="app-quiz" class="app-screen"></div>
+    <div id="app-vocab" class="app-screen"></div>
+    <div id="app-review" class="app-screen"></div>
+    <div id="app-quizzes" class="app-screen"></div>
+    <div id="app-achievements" class="app-screen"></div>
+    <div id="app-profile" class="app-screen"></div>
+    <div id="app-settings" class="app-screen"></div>
+    <div id="app-statistics" class="app-screen"></div>
+    <div id="app-daily" class="app-screen"></div>
+    <div id="app-complete" class="app-screen"></div>
+  </main>
+
+  <nav class="bottom-nav" id="bottomNav">
+    <button data-app-nav="dashboard">🏠</button>
+    <button data-app-nav="path">📘</button>
+    <button data-app-nav="review">🔁</button>
+    <button data-app-nav="achievements">🏆</button>
+    <button data-app-nav="profile">👤</button>
+  </nav>
+</div>
+
+<div id="modalRoot"></div>
+
+<script>
+/* ===================================================================
+   LexiLearn — application logic
+   No backend. Everything lives in localStorage. Organized as:
+   1. Content data (languages + lessons)
+   2. Storage helpers (saveData/loadData/etc — required helper names)
+   3. Progress engine (XP, streak, achievements, lessons, quizzes)
+   4. Quiz engine (question generation + rendering)
+   5. Screen renderers
+   6. Navigation & event wiring
+   =================================================================== */
+
+/* ---------------------------------------------------------------
+   1. CONTENT DATA
+   --------------------------------------------------------------- */
+const LANGUAGES = {
+  it: { code:'it', name:'Italian', native:'Italiano', flag:'🇮🇹', bcp47:'it-IT', rtl:false,
+        difficulty:'Easiest for English speakers', accent:['#2e9c5b','#c9302c'],
+        desc:'A melodic Romance language with lots of vocabulary in common with English.' },
+  de: { code:'de', name:'German', native:'Deutsch', flag:'🇩🇪', bcp47:'de-DE', rtl:false,
+        difficulty:'Moderate — logical grammar', accent:['#1a1a1a','#c9a84c'],
+        desc:'A structured, rule-based language and English\u2019s closest major relative.' },
+  ar: { code:'ar', name:'Arabic', native:'العربية', flag:'🇸🇦', bcp47:'ar-SA', rtl:true,
+        difficulty:'Challenging — new script', accent:['#2f6fbb','#5b93ef'],
+        desc:'A rich language written right-to-left, spoken across the Middle East & North Africa.' },
+  ja: { code:'ja', name:'Japanese', native:'日本語', flag:'🇯🇵', bcp47:'ja-JP', rtl:false,
+        difficulty:'Challenging — new writing systems', accent:['#d64550','#f2a6ad'],
+        desc:'Built on hiragana, katakana and kanji, with a deep culture of politeness.' },
+  ro: { code:'ro', name:'Romanian', native:'Română', flag:'🇷🇴', bcp47:'ro-RO', rtl:false,
+        difficulty:'Moderate — Latin roots', accent:['#2f5fa8','#f2c230'],
+        desc:'The Romance language closest to Latin, spoken in Romania and Moldova.' },
+};
+
+function v(word,eng,pron,example,category){ return {word,eng,pron,example,category}; }
+
+const CONTENT = {
+  it: { extra: [], chapters:[
+    { id:1, title:'Chapter 1 — First Steps', lessons:[
+      { id:1, title:'Greetings', objective:'Greet people and say goodbye politely.',
+        vocab:[ v('Ciao','Hello / Hi','chow','Ciao, come stai?','Greetings'),
+                v('Buongiorno','Good morning','bwon-jor-no','Buongiorno, signora!','Greetings'),
+                v('Buonasera','Good evening','bwo-na-seh-ra','Buonasera a tutti.','Greetings'),
+                v('Arrivederci','Goodbye (formal)','ar-ree-veh-der-chee','Arrivederci, a presto!','Greetings'),
+                v('Grazie','Thank you','grah-tsyeh','Grazie mille!','Greetings') ],
+        grammar:{title:'Formal vs. informal', body:'“Ciao” is informal, used with friends and family. “Buongiorno / buonasera” and “arrivederci” are used in polite or formal situations.'},
+        sentence:{words:['Io','sono','Alex'], answer:['Io','sono','Alex'], translation:'I am Alex'} },
+      { id:2, title:'Introducing Yourself', objective:'Say your name and where you\u2019re from.',
+        vocab:[ v('Mi chiamo','My name is','mee kya-mo','Mi chiamo Marco.','Introductions'),
+                v('Piacere','Nice to meet you','pya-che-reh','Piacere di conoscerti.','Introductions'),
+                v('Come ti chiami?','What is your name?','ko-meh tee kya-mee','Come ti chiami?','Introductions'),
+                v('Sono di...','I am from...','so-no dee','Sono di Roma.','Introductions'),
+                v('Anche io','Me too','an-keh ee-oh','Anche io sono felice.','Introductions') ],
+        grammar:{title:'Subject pronouns', body:'“Io” means I, “tu” means you. Italian often drops these pronouns since the verb ending already shows who is speaking.'},
+        sentence:{words:['Mi','chiamo','Elena'], answer:['Mi','chiamo','Elena'], translation:'My name is Elena'} } ] },
+    { id:2, title:'Chapter 2 — Building Sentences', lessons:[
+      { id:1, title:'Pronouns & Basic Verbs', objective:'Use “essere” (to be) with simple pronouns.',
+        vocab:[ v('Io','I','ee-oh','Io parlo italiano.','Common Verbs'),
+                v('Tu','You','too','Tu sei simpatico.','Common Verbs'),
+                v('Lui/Lei','He / She','loo-ee / leh-ee','Lei è italiana.','Common Verbs'),
+                v('Essere','to be','eh-seh-reh','Voglio essere felice.','Common Verbs'),
+                v('Avere','to have','ah-veh-reh','Ho un libro.','Common Verbs') ],
+        grammar:{title:'Present tense of “essere”', body:'io sono (I am), tu sei (you are), lui/lei è (he/she is). This is one of the most important verbs to memorize early.'},
+        sentence:{words:['Lei','è','italiana'], answer:['Lei','è','italiana'], translation:'She is Italian'} },
+      { id:2, title:'Everyday Expressions', objective:'Use common polite phrases and simple negation.',
+        vocab:[ v('Per favore','Please','per fa-vo-reh','Un caffè, per favore.','Everyday Phrases'),
+                v('Prego','You\u2019re welcome','preh-go','Grazie! — Prego!','Everyday Phrases'),
+                v('Scusa','Excuse me / Sorry','skoo-za','Scusa, dov\u2019è la stazione?','Everyday Phrases'),
+                v('Non capisco','I don\u2019t understand','non ka-pee-sko','Mi dispiace, non capisco.','Everyday Phrases'),
+                v('Va bene','Okay / Fine','va beh-neh','Va bene, ci vediamo domani.','Everyday Phrases') ],
+        grammar:{title:'Negation with “non”', body:'Place “non” directly before the verb to negate a sentence: non capisco = I don\u2019t understand.'},
+        sentence:{words:['Non','capisco','bene'], answer:['Non','capisco','bene'], translation:'I don\u2019t understand well'} } ] } ] },
+
+  de: { extra: [], chapters:[
+    { id:1, title:'Chapter 1 — First Steps', lessons:[
+      { id:1, title:'Greetings', objective:'Greet people and say goodbye politely.',
+        vocab:[ v('Hallo','Hello','hah-lo','Hallo, wie geht\u2019s?','Greetings'),
+                v('Guten Morgen','Good morning','goo-ten mor-gen','Guten Morgen, Frau Schmidt.','Greetings'),
+                v('Guten Abend','Good evening','goo-ten ah-bent','Guten Abend zusammen.','Greetings'),
+                v('Auf Wiedersehen','Goodbye (formal)','owf vee-der-zayn','Auf Wiedersehen, bis morgen!','Greetings'),
+                v('Danke','Thank you','dahn-kuh','Danke schön!','Greetings') ],
+        grammar:{title:'Greetings change with time of day', body:'“Tschüss” is casual for goodbye; “Auf Wiedersehen” is formal. Germans greet differently in the morning vs. evening.'},
+        sentence:{words:['Ich','heiße','Anna'], answer:['Ich','heiße','Anna'], translation:'My name is Anna'} },
+      { id:2, title:'Introducing Yourself', objective:'Say your name and where you\u2019re from.',
+        vocab:[ v('Ich heiße...','My name is...','ikh hy-suh','Ich heiße Peter.','Introductions'),
+                v('Freut mich','Nice to meet you','froyt mikh','Freut mich, dich kennenzulernen.','Introductions'),
+                v('Wie heißt du?','What\u2019s your name?','vee hyst doo','Wie heißt du?','Introductions'),
+                v('Ich komme aus...','I come from...','ikh kom-uh ows','Ich komme aus Berlin.','Introductions'),
+                v('auch','also / too','owkh','Ich auch!','Introductions') ],
+        grammar:{title:'Capitalized nouns', body:'German capitalizes every noun, even mid-sentence — not just proper names: das Buch, die Stadt.'},
+        sentence:{words:['Ich','komme','aus','Berlin'], answer:['Ich','komme','aus','Berlin'], translation:'I come from Berlin'} } ] },
+    { id:2, title:'Chapter 2 — Building Sentences', lessons:[
+      { id:1, title:'Pronouns & Verb Placement', objective:'Use “sein” (to be) and understand word order.',
+        vocab:[ v('ich','I','ikh','Ich lerne Deutsch.','Common Verbs'),
+                v('du','you','doo','Du bist nett.','Common Verbs'),
+                v('er/sie','he / she','air / zee','Sie ist Lehrerin.','Common Verbs'),
+                v('sein','to be','zyn','Ich will glücklich sein.','Common Verbs'),
+                v('haben','to have','hah-ben','Ich habe ein Buch.','Common Verbs') ],
+        grammar:{title:'Verb-second word order', body:'The conjugated verb is always the second element in a German statement, even if something else starts the sentence.'},
+        sentence:{words:['Sie','ist','Lehrerin'], answer:['Sie','ist','Lehrerin'], translation:'She is a teacher'} },
+      { id:2, title:'Everyday Expressions', objective:'Use polite phrases and basic negation.',
+        vocab:[ v('Bitte','Please / You\u2019re welcome','bit-uh','Ein Kaffee, bitte.','Everyday Phrases'),
+                v('Entschuldigung','Excuse me / Sorry','ent-shool-di-goong','Entschuldigung, wo ist der Bahnhof?','Everyday Phrases'),
+                v('Ich verstehe nicht','I don\u2019t understand','ikh fer-shtay-uh nikht','Es tut mir leid, ich verstehe nicht.','Everyday Phrases'),
+                v('Kein Problem','No problem','kyn pro-blaym','Kein Problem, alles gut.','Everyday Phrases'),
+                v('Vielleicht','Maybe','fee-lykht','Vielleicht komme ich später.','Everyday Phrases') ],
+        grammar:{title:'Negating with “nicht”', body:'“Nicht” negates a verb or sentence, usually placed after the verb or at the end of the clause.'},
+        sentence:{words:['Ich','verstehe','nicht'], answer:['Ich','verstehe','nicht'], translation:'I don\u2019t understand'} } ] } ] },
+
+  ro: { extra: [], chapters:[
+    { id:1, title:'Chapter 1 — First Steps', lessons:[
+      { id:1, title:'Greetings', objective:'Greet people and say goodbye politely.',
+        vocab:[ v('Salut','Hi','sah-loot','Salut, ce faci?','Greetings'),
+                v('Bună dimineața','Good morning','boo-nuh dee-mee-nya-tsah','Bună dimineața tuturor!','Greetings'),
+                v('Bună seara','Good evening','boo-nuh seh-ah-rah','Bună seara, doamnă.','Greetings'),
+                v('La revedere','Goodbye','lah reh-veh-deh-reh','La revedere, pe curând!','Greetings'),
+                v('Mulțumesc','Thank you','mool-tsoo-mesk','Mulțumesc mult!','Greetings') ],
+        grammar:{title:'Casual vs. neutral greetings', body:'“Salut” is casual; “Bună ziua” (good day) is more neutral and polite, and works at any time of day.'},
+        sentence:{words:['Eu','sunt','Maria'], answer:['Eu','sunt','Maria'], translation:'I am Maria'} },
+      { id:2, title:'Introducing Yourself', objective:'Say your name and where you\u2019re from.',
+        vocab:[ v('Mă numesc...','My name is...','muh noo-mesk','Mă numesc Andrei.','Introductions'),
+                v('Îmi pare bine','Nice to meet you','uhm pah-reh bee-neh','Îmi pare bine de cunoștință.','Introductions'),
+                v('Cum te numești?','What\u2019s your name?','koom teh noo-meshty','Cum te numești?','Introductions'),
+                v('Sunt din...','I am from...','soont deen','Sunt din România.','Introductions'),
+                v('și eu','me too','shee yeh-oo','Și eu sunt fericit.','Introductions') ],
+        grammar:{title:'A quick note on cases', body:'Romanian nouns change endings by case, but beginner phrases like these work fine without worrying about that yet.'},
+        sentence:{words:['Sunt','din','România'], answer:['Sunt','din','România'], translation:'I am from Romania'} } ] },
+    { id:2, title:'Chapter 2 — Building Sentences', lessons:[
+      { id:1, title:'Pronouns & Verbs', objective:'Use “a fi” (to be) with simple pronouns.',
+        vocab:[ v('eu','I','yeh-oo','Eu învăț română.','Common Verbs'),
+                v('tu','you','too','Tu ești amabil.','Common Verbs'),
+                v('el/ea','he / she','yel / yah','Ea este profesoară.','Common Verbs'),
+                v('a fi','to be','ah fee','Vreau să fiu fericit.','Common Verbs'),
+                v('a avea','to have','ah ah-veh-ah','Am o carte.','Common Verbs') ],
+        grammar:{title:'Present tense of “a fi”', body:'eu sunt (I am), tu ești (you are), el/ea este (he/she is) — the core building block for simple sentences.'},
+        sentence:{words:['Ea','este','profesoară'], answer:['Ea','este','profesoară'], translation:'She is a teacher'} },
+      { id:2, title:'Everyday Expressions', objective:'Use polite phrases and basic negation.',
+        vocab:[ v('Te rog','Please','teh rog','O cafea, te rog.','Everyday Phrases'),
+                v('Cu plăcere','You\u2019re welcome','koo pluh-cheh-reh','Mulțumesc! — Cu plăcere!','Everyday Phrases'),
+                v('Scuze','Excuse me / Sorry','skoo-zeh','Scuze, unde e gara?','Everyday Phrases'),
+                v('Nu înțeleg','I don\u2019t understand','noo uhn-tzeh-leg','Îmi pare rău, nu înțeleg.','Everyday Phrases'),
+                v('Bine','Okay / Good','bee-neh','Bine, ne vedem mâine.','Everyday Phrases') ],
+        grammar:{title:'Negation with “nu”', body:'Place “nu” directly before the verb to negate it: nu înțeleg = I don\u2019t understand.'},
+        sentence:{words:['Nu','înțeleg','bine'], answer:['Nu','înțeleg','bine'], translation:'I don\u2019t understand well'} } ] } ] },
+
+  ja: { extra:[ v('あ','a (character)','ah','Hiragana vowel.','Alphabet'), v('い','i (character)','ee','Hiragana vowel.','Alphabet'),
+                 v('う','u (character)','oo','Hiragana vowel.','Alphabet'), v('え','e (character)','eh','Hiragana vowel.','Alphabet'),
+                 v('お','o (character)','oh','Hiragana vowel.','Alphabet'), v('か','ka (character)','kah','Hiragana syllable.','Alphabet') ],
+      chapters:[
+    { id:1, title:'Chapter 1 — First Steps', lessons:[
+      { id:1, title:'Greetings', objective:'Greet people at different times of day.',
+        vocab:[ v('こんにちは','Hello','kon-nee-chee-wah','こんにちは、元気ですか？','Greetings'),
+                v('おはようございます','Good morning','oh-hah-yoh go-zai-mas','おはようございます、田中さん。','Greetings'),
+                v('こんばんは','Good evening','kohn-bahn-wah','こんばんは、皆さん。','Greetings'),
+                v('さようなら','Goodbye','sah-yoh-nah-rah','さようなら、また明日。','Greetings'),
+                v('ありがとう','Thank you','ah-ree-gah-toh','ありがとうございます！','Greetings') ],
+        grammar:{title:'Greetings by time of day', body:'Like English, Japanese greetings change with the time of day, but they are used more consistently and formally in daily life.'},
+        sentence:{words:['watashi','wa','Alex','desu'], answer:['watashi','wa','Alex','desu'], translation:'I am Alex'} },
+      { id:2, title:'Introducing Yourself', objective:'Say who you are using “wa” and “desu”.',
+        vocab:[ v('わたし','I / me','wah-tah-shee','わたしは学生です。','Introductions'),
+                v('です','to be (polite)','dess','田中です。','Introductions'),
+                v('はじめまして','Nice to meet you','hah-jee-meh-mah-shteh','はじめまして、よろしく。','Introductions'),
+                v('お名前は？','What is your name?','oh-nah-may wah','お名前は何ですか？','Introductions'),
+                v('も','also / too','moh','わたしも学生です。','Introductions') ],
+        grammar:{title:'The topic particle は (wa)', body:'は marks the topic of a sentence: わたしは... means “as for me...”. It is written は but pronounced “wa” here.'},
+        sentence:{words:['watashi','wa','gakusei','desu'], answer:['watashi','wa','gakusei','desu'], translation:'I am a student'} } ] },
+    { id:2, title:'Chapter 2 — Building Sentences', lessons:[
+      { id:1, title:'Basic Particles', objective:'Recognize the particles の, を and が.',
+        vocab:[ v('です','is / am / are','dess','元気です。','Common Verbs'),
+                v('ます','polite verb ending','mahs','食べます。','Common Verbs'),
+                v('の','possessive particle','noh','わたしの本。','Common Verbs'),
+                v('を','object marker','oh','水を飲みます。','Common Verbs'),
+                v('が','subject marker','gah','猫がいます。','Common Verbs') ],
+        grammar:{title:'Subject-Object-Verb order', body:'Japanese sentences are ordered Subject-Object-Verb, and particles like を and が show what role each word plays.'},
+        sentence:{words:['kore','wa','hon','desu'], answer:['kore','wa','hon','desu'], translation:'This is a book'} },
+      { id:2, title:'Everyday Expressions', objective:'Apologize politely and say you don\u2019t understand.',
+        vocab:[ v('すみません','Excuse me / Sorry','soo-mee-mah-sen','すみません、駅はどこですか？','Everyday Phrases'),
+                v('お願いします','Please','oh-neh-guy-shee-mahs','お水をお願いします。','Everyday Phrases'),
+                v('わかりません','I don\u2019t understand','wah-kah-ree-mah-sen','すみません、わかりません。','Everyday Phrases'),
+                v('だいじょうぶ','It\u2019s okay / fine','dai-joh-boo','だいじょうぶですか？','Everyday Phrases'),
+                v('はい / いいえ','yes / no','hi / ee-eh','はい、そうです。','Everyday Phrases') ],
+        grammar:{title:'Negating polite verbs', body:'Changing a polite verb ending from ます (masu) to ません (masen) makes it negative: わかります → わかりません.'},
+        sentence:{words:['watashi','wa','wakarimasen'], answer:['watashi','wa','wakarimasen'], translation:'I don\u2019t understand'} } ] } ] },
+
+  ar: { extra:[ v('ا','Alif','aa','First letter of the alphabet.','Alphabet'), v('ب','Ba','b','Second letter of the alphabet.','Alphabet'),
+                v('ت','Ta','t','Third letter of the alphabet.','Alphabet'), v('ث','Tha','th','Fourth letter of the alphabet.','Alphabet'),
+                v('ج','Jeem','j','Fifth letter of the alphabet.','Alphabet'), v('د','Dal','d','Sixth letter of the alphabet.','Alphabet') ],
+      chapters:[
+    { id:1, title:'الفصل الأول — Chapter 1 — First Steps', lessons:[
+      { id:1, title:'Greetings', objective:'Greet people and say goodbye politely.',
+        vocab:[ v('مرحبا','Hello','mar-ha-ba','مرحبا، كيف حالك؟','Greetings'),
+                v('صباح الخير','Good morning','sa-bah al-khayr','صباح الخير يا أستاذ.','Greetings'),
+                v('مساء الخير','Good evening','ma-saa al-khayr','مساء الخير جميعا.','Greetings'),
+                v('مع السلامة','Goodbye','ma\u2019a as-sa-la-ma','مع السلامة، أراك غدا.','Greetings'),
+                v('شكرا','Thank you','shuk-ran','شكرا جزيلا!','Greetings') ],
+        grammar:{title:'Reading direction', body:'Arabic is written and read right-to-left. “مرحبا” is casual and friendly; “السلام عليكم” is a common formal greeting.'},
+        sentence:{words:['اسمي','أليكس'], answer:['اسمي','أليكس'], translation:'My name is Alex'} },
+      { id:2, title:'Introducing Yourself', objective:'Say your name and where you\u2019re from.',
+        vocab:[ v('اسمي...','My name is...','is-mee','اسمي سارة.','Introductions'),
+                v('تشرفنا','Nice to meet you','ta-shar-raf-na','تشرفنا بلقائك.','Introductions'),
+                v('ما اسمك؟','What is your name?','ma is-mu-ka','ما اسمك؟','Introductions'),
+                v('أنا من...','I am from...','a-na min','أنا من مصر.','Introductions'),
+                v('أيضا','also / too','ay-dan','وأنا أيضا.','Introductions') ],
+        grammar:{title:'No “to be” verb', body:'Simple present-tense sentences like “I am Alex” don\u2019t need a separate verb “to be” in Arabic — the words are just placed next to each other.'},
+        sentence:{words:['أنا','من','مصر'], answer:['أنا','من','مصر'], translation:'I am from Egypt'} } ] },
+    { id:2, title:'الفصل الثاني — Chapter 2 — Building Sentences', lessons:[
+      { id:1, title:'Pronouns & Sentence Structure', objective:'Use pronouns and the definite article.',
+        vocab:[ v('أنا','I','a-na','أنا طالب.','Common Verbs'),
+                v('أنتَ','you (m.)','an-ta','أنتَ لطيف.','Common Verbs'),
+                v('هو / هي','he / she','hu-wa / hi-ya','هي معلمة.','Common Verbs'),
+                v('الـ','the','al','الكتاب على الطاولة.','Common Verbs'),
+                v('كتاب','book','ki-tab','هذا كتاب جميل.','Common Verbs') ],
+        grammar:{title:'The definite article الـ', body:'“الـ” attaches directly to a noun to make it definite: كتاب (a book) → الكتاب (the book).'},
+        sentence:{words:['هي','معلمة','جيدة'], answer:['هي','معلمة','جيدة'], translation:'She is a good teacher'} },
+      { id:2, title:'Everyday Expressions', objective:'Apologize politely and say you don\u2019t understand.',
+        vocab:[ v('من فضلك','Please','min fad-lik','قهوة، من فضلك.','Everyday Phrases'),
+                v('عفوا','You\u2019re welcome / Excuse me','af-wan','شكرا! — عفوا!','Everyday Phrases'),
+                v('آسف','Sorry','aa-sif','آسف، لم أفهم.','Everyday Phrases'),
+                v('لا أفهم','I don\u2019t understand','la af-ham','آسف، لا أفهم.','Everyday Phrases'),
+                v('لا بأس','It\u2019s okay','la ba\u2019s','لا بأس، لا تقلق.','Everyday Phrases') ],
+        grammar:{title:'Negation with لا', body:'“لا” placed directly before a present-tense verb negates it: لا أفهم = I don\u2019t understand.'},
+        sentence:{words:['لا','أفهم','جيدا'], answer:['لا','أفهم','جيدا'], translation:'I don\u2019t understand well'} } ] } ] },
+};
+
+const ACHIEVEMENTS = [
+  {id:'first_lesson', name:'First Steps', icon:'🥇', desc:'Complete your first lesson.', check:p=>p.totalLessonsCompleted>=1},
+  {id:'quiz_master', name:'Quiz Master', icon:'🎯', desc:'Score 100% on any quiz.', check:p=>!!p.hadPerfectQuiz},
+  {id:'bookworm', name:'Bookworm', icon:'📚', desc:'Complete 10 lessons.', check:p=>p.totalLessonsCompleted>=10},
+  {id:'week_warrior', name:'Week Warrior', icon:'🔥', desc:'Maintain a 7-day streak.', check:p=>p.streak>=7},
+  {id:'language_explorer', name:'Language Explorer', icon:'🗺️', desc:'Start learning 3 languages.', check:p=>Object.values(p.languages).filter(l=>l.started).length>=3},
+  {id:'chapter_champion', name:'Chapter Champion', icon:'🏆', desc:'Pass your first chapter exam.', check:p=>Object.values(p.languages).some(l=>l.examsPassed && l.examsPassed.length>=1)},
+  {id:'vocab_collector', name:'Vocabulary Collector', icon:'🗂️', desc:'Mark 15 words as known.', check:p=>countKnownVocab(p)>=15},
+  {id:'daily_devotee', name:'Daily Devotee', icon:'📅', desc:'Complete 5 daily challenges.', check:p=>(p.dailyChallengesCompleted||0)>=5},
+];
+
+const LEVEL_THRESHOLDS = [0,100,250,450,700,1000,1400,1900,2500,3200,4000,5000,6200,7600,9200,11000];
+
+/* ---------------------------------------------------------------
+   2. STORAGE HELPERS
+   --------------------------------------------------------------- */
+function loadUsers(){ try{ return JSON.parse(localStorage.getItem('lexi_users')||'{}'); }catch(e){ return {}; } }
+function saveUsers(u){ localStorage.setItem('lexi_users', JSON.stringify(u)); }
+
+function getSession(){
+  try{ return JSON.parse(localStorage.getItem('lexi_session') || sessionStorage.getItem('lexi_session') || 'null'); }
+  catch(e){ return null; }
+}
+function setSession(username, remember){
+  const s = JSON.stringify({username});
+  if(remember){ localStorage.setItem('lexi_session', s); sessionStorage.removeItem('lexi_session'); }
+  else { sessionStorage.setItem('lexi_session', s); localStorage.removeItem('lexi_session'); }
+}
+function clearSession(){ localStorage.removeItem('lexi_session'); sessionStorage.removeItem('lexi_session'); }
+
+function defaultProfile(email){
+  const languages = {};
+  Object.keys(LANGUAGES).forEach(code=>{
+    languages[code] = { started:false, unlockedChapter:1, completedLessons:[], examsPassed:[], quizScores:[], mistakes:[], vocabStatus:{} };
+  });
+  return {
+    email: email||'', xp:0, streak:0, longestStreak:0, lastActiveDate:null,
+    currentLanguage:null, languages,
+    achievements:[], dailyChallenge:{date:null}, dailyChallengesCompleted:0,
+    settings:{darkMode:false, sound:true, speech:true, animations:true},
+    joinDate:Date.now(), totalLessonsCompleted:0, totalQuizzes:0, totalCorrect:0, totalQuestions:0,
+    totalTimeSeconds:0, hadPerfectQuiz:false,
+  };
+}
+// required helper: loadData()
+function loadData(username){
+  try{
+    const raw = localStorage.getItem('lexi_data_'+username);
+    if(!raw) return defaultProfile();
+    const p = JSON.parse(raw);
+    // graceful fallback for missing keys (e.g. after refresh with older shape)
+    const d = defaultProfile(p.email);
+    return Object.assign(d, p, {languages: Object.assign(d.languages, p.languages||{})});
+  }catch(e){ return defaultProfile(); }
+}
+// required helper: saveData()
+function saveData(username, profile){
+  localStorage.setItem('lexi_data_'+username, JSON.stringify(profile));
+}
+
+function currentUsername(){ const s=getSession(); return s ? s.username : null; }
+function currentProfile(){ const u=currentUsername(); return u ? loadData(u) : null; }
+function persist(profile){ const u=currentUsername(); if(u) saveData(u, profile); }
+
+function countKnownVocab(p){
+  let n=0;
+  Object.values(p.languages).forEach(l=>{ Object.values(l.vocabStatus||{}).forEach(s=>{ if(s==='easy') n++; }); });
+  return n;
+}
+
+/* ---------------------------------------------------------------
+   3. PROGRESS ENGINE
+   --------------------------------------------------------------- */
+function levelInfo(xp){
+  let level=1;
+  for(let i=0;i<LEVEL_THRESHOLDS.length;i++){ if(xp>=LEVEL_THRESHOLDS[i]) level=i+1; }
+  const curr = LEVEL_THRESHOLDS[level-1] ?? 0;
+  const next = LEVEL_THRESHOLDS[level] ?? (curr+1500);
+  const pct = Math.min(100, Math.round(((xp-curr)/(next-curr))*100));
+  return {level, curr, next, pct};
+}
+
+function addXP(profile, amount, evt){
+  profile.xp += amount;
+  if(evt){ try{ showXPFloat(amount, evt); }catch(e){} }
+  return profile;
+}
+
+function updateStreak(profile){
+  const today = new Date().toISOString().slice(0,10);
+  if(profile.lastActiveDate === today){ /* already counted today */ }
+  else{
+    const y = new Date(); y.setDate(y.getDate()-1);
+    const yesterday = y.toISOString().slice(0,10);
+    profile.streak = (profile.lastActiveDate === yesterday) ? (profile.streak+1) : 1;
+    profile.lastActiveDate = today;
+    profile.longestStreak = Math.max(profile.longestStreak||0, profile.streak);
+  }
+  return profile;
+}
+
+function checkAchievements(profile){
+  const unlocked = [];
+  ACHIEVEMENTS.forEach(a=>{
+    if(!profile.achievements.includes(a.id) && a.check(profile)){
+      profile.achievements.push(a.id);
+      unlocked.push(a);
+    }
+  });
+  unlocked.forEach(a=>{ showToast(`🏆 Achievement unlocked: ${a.name}`, 'success'); spawnConfetti(); });
+}
+
+function isLessonUnlocked(profile, lang, chId, lsId){
+  const L = profile.languages[lang];
+  if(chId < L.unlockedChapter) return true;
+  if(chId > L.unlockedChapter) return false;
+  const chapter = CONTENT[lang].chapters.find(c=>c.id===chId);
+  const idx = chapter.lessons.findIndex(ls=>ls.id===lsId);
+  if(idx===0) return true;
+  const prev = chapter.lessons[idx-1];
+  return L.completedLessons.includes(chId+'-'+prev.id);
+}
+function isLessonDone(profile, lang, chId, lsId){ return profile.languages[lang].completedLessons.includes(chId+'-'+lsId); }
+function isChapterComplete(profile, lang, chId){
+  const chapter = CONTENT[lang].chapters.find(c=>c.id===chId);
+  return chapter.lessons.every(ls=>isLessonDone(profile, lang, chId, ls.id));
+}
+
+// required helper: completeLesson()
+function completeLesson(lang, chId, lsId, correctInStages, totalInStages){
+  const profile = currentProfile();
+  const key = chId+'-'+lsId;
+  const L = profile.languages[lang];
+  if(!L.completedLessons.includes(key)) L.completedLessons.push(key);
+  profile.totalLessonsCompleted++;
+  profile.totalTimeSeconds += 180;
+  if(totalInStages){ profile.totalCorrect+=correctInStages; profile.totalQuestions+=totalInStages; }
+  addXP(profile, 25);
+  updateStreak(profile);
+  // unlock next chapter if this was the last lesson
+  const chapter = CONTENT[lang].chapters.find(c=>c.id===chId);
+  const isLast = chapter.lessons[chapter.lessons.length-1].id === lsId;
+  checkAchievements(profile);
+  persist(profile);
+  return profile;
+}
+
+// required helper: saveQuizResult()
+function saveQuizResult(lang, quizType, correct, total, xpAwarded, missed){
+  const profile = currentProfile();
+  const L = profile.languages[lang];
+  L.quizScores.push({type:quizType, correct, total, date:Date.now()});
+  profile.totalQuizzes++;
+  profile.totalCorrect += correct; profile.totalQuestions += total;
+  profile.totalTimeSeconds += 90;
+  if(total>0 && correct===total) profile.hadPerfectQuiz = true;
+  (missed||[]).forEach(m=>{
+    if(!L.mistakes.find(x=>x.word===m.word)) L.mistakes.unshift({word:m.word, eng:m.eng, pron:m.pron});
+    L.mistakes = L.mistakes.slice(0,20);
+  });
+  addXP(profile, xpAwarded);
+  updateStreak(profile);
+  checkAchievements(profile);
+  persist(profile);
+  return profile;
+}
+
+// required helper: updateProgress() — re-renders whatever app screen is active
+function updateProgress(){
+  const active = document.querySelector('.app-screen.active');
+  if(active) renderScreen(active.id.replace('app-',''));
+}
+
+/* ---------------------------------------------------------------
+   4. QUIZ ENGINE
+   --------------------------------------------------------------- */
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function sample(arr,n){ return shuffle(arr).slice(0,n); }
+
+function allVocabForLang(lang){
+  let pool = (CONTENT[lang].extra||[]).slice();
+  CONTENT[lang].chapters.forEach(ch=>ch.lessons.forEach(ls=>pool=pool.concat(ls.vocab)));
+  return pool;
+}
+
+function buildQuestionsFromVocab(vocabScope, widePool, count, sentenceEx){
+  const qs = [];
+  const picks = sample(vocabScope, Math.min(count, vocabScope.length));
+  picks.forEach(item=>{
+    const forward = Math.random()<0.5;
+    if(forward){
+      const distractors = sample(widePool.filter(x=>x.eng!==item.eng), 3).map(x=>x.eng);
+      const options = shuffle([item.eng, ...distractors]);
+      qs.push({type:'mcq', prompt:`What does "${item.word}" mean?`, options, correct:item.eng,
+                explanation:`"${item.word}" means "${item.eng}". ${item.example||''}`, ref:item});
+    } else {
+      const distractors = sample(widePool.filter(x=>x.word!==item.word), 3).map(x=>x.word);
+      const options = shuffle([item.word, ...distractors]);
+      qs.push({type:'mcq', prompt:`Which word means "${item.eng}"?`, options, correct:item.word,
+                explanation:`"${item.eng}" is "${item.word}". ${item.example||''}`, ref:item});
+    }
+  });
+  if(sentenceEx){
+    qs.push({type:'sentence', prompt:`Put the words in order: "${sentenceEx.translation}"`,
+              bank:shuffle(sentenceEx.words), answer:sentenceEx.answer, ref:null});
+  }
+  return shuffle(qs);
+}
+
+let quizState = null;
+function startQuiz(lang, questions, opts){
+  quizState = { lang, questions, index:0, correct:0, missed:[], chosen:[], opts };
+  showAppScreen('quiz');
+  renderQuizQuestion();
+}
+function renderQuizQuestion(){
+  const box = document.getElementById('app-quiz');
+  const qs = quizState.questions;
+  if(quizState.index >= qs.length){ return finishQuiz(); }
+  const q = qs[quizState.index];
+  const langDir = LANGUAGES[quizState.lang].rtl ? 'rtl' : 'ltr';
+  let html = `<div class="card">
+    <div class="lesson-crumbs">${quizState.opts.title} · Question ${quizState.index+1} of ${qs.length}</div>
+    <h2>${q.prompt}</h2>`;
+  if(q.type==='mcq'){
+    html += `<div class="option-list" id="optList" dir="${langDir}">` +
+      q.options.map(o=>`<button class="option-item" data-val="${encodeURIComponent(o)}">${o}</button>`).join('') +
+      `</div><div id="feedbackBox"></div>`;
+  } else {
+    html += `<div class="sentence-bank" id="bank" dir="${langDir}">` +
+      q.bank.map((w,i)=>`<button class="word-chip" data-i="${i}">${w}</button>`).join('') +
+      `</div><div class="sentence-chosen" id="chosen" dir="${langDir}"></div>
+       <button class="btn btn-primary" id="checkSentence">Check</button>
+       <div id="feedbackBox"></div>`;
+  }
+  html += `<div class="lesson-actions"><span></span><button class="btn btn-primary" id="nextQ" style="display:none">Next →</button></div></div>`;
+  box.innerHTML = html;
+
+  if(q.type==='mcq'){
+    box.querySelectorAll('.option-item').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const val = decodeURIComponent(btn.dataset.val);
+        box.querySelectorAll('.option-item').forEach(b=>{
+          b.disabled=true;
+          const bv = decodeURIComponent(b.dataset.val);
+          if(bv===q.correct) b.classList.add('correct');
+          else if(b===btn) b.classList.add('incorrect');
+        });
+        const ok = val===q.correct;
+        if(ok) quizState.correct++; else if(q.ref) quizState.missed.push(q.ref);
+        document.getElementById('feedbackBox').innerHTML = `<div class="explain-box ${ok?'right':'wrong'}">${ok?'✅ Correct! ':'❌ Not quite. '}${q.explanation}</div>`;
+        document.getElementById('nextQ').style.display='inline-flex';
+      });
+    });
+  } else {
+    let chosen = [];
+    const bankEl = box.querySelector('#bank'), chosenEl = box.querySelector('#chosen');
+    bankEl.querySelectorAll('.word-chip').forEach(chip=>{
+      chip.addEventListener('click', ()=>{
+        if(chip.classList.contains('picked')) return;
+        chip.classList.add('picked');
+        chosen.push({i:chip.dataset.i, w:chip.textContent});
+        const c = document.createElement('button');
+        c.className='word-chip placed'; c.textContent=chip.textContent; c.dataset.i=chip.dataset.i;
+        c.addEventListener('click', ()=>{
+          chosen = chosen.filter(x=>x.i!==c.dataset.i);
+          bankEl.querySelector(`.word-chip[data-i="${c.dataset.i}"]`).classList.remove('picked');
+          c.remove();
+        });
+        chosenEl.appendChild(c);
+      });
+    });
+    box.querySelector('#checkSentence').addEventListener('click', ()=>{
+      const words = chosen.map(x=>x.w);
+      const ok = JSON.stringify(words)===JSON.stringify(q.answer);
+      if(ok) quizState.correct++; else if(q.ref) quizState.missed.push(q.ref);
+      document.getElementById('feedbackBox').innerHTML = `<div class="explain-box ${ok?'right':'wrong'}">${ok?'✅ Correct!':'❌ Correct order: “'+q.answer.join(' ')+'”'}</div>`;
+      document.getElementById('nextQ').style.display='inline-flex';
+      box.querySelector('#checkSentence').disabled = true;
+      bankEl.querySelectorAll('.word-chip').forEach(b=>b.disabled=true);
+    });
+  }
+  box.querySelector('#nextQ').addEventListener('click', ()=>{ quizState.index++; renderQuizQuestion(); });
+}
+function finishQuiz(){
+  const {lang, correct, questions, missed, opts} = quizState;
+  const total = questions.length;
+  const xp = opts.xpMode==='flat' ? opts.flatXP : correct*opts.perCorrectXP;
+  saveQuizResult(lang, opts.quizType, correct, total, xp, missed);
+  let justFinishedLanguage = false;
+  if(opts.quizType==='chapter-exam' && total>0 && (correct/total)>=0.6){
+    const profile = currentProfile();
+    const L = profile.languages[lang];
+    if(!L.examsPassed.includes(opts.chapterId)){
+      L.examsPassed.push(opts.chapterId);
+      if(opts.chapterId===L.unlockedChapter){
+        L.unlockedChapter++;
+        showToast(`Chapter ${opts.chapterId+1} unlocked!`,'success');
+      }
+      if(L.examsPassed.length >= CONTENT[lang].chapters.length) justFinishedLanguage = true;
+      persist(profile);
+    }
+  }
+  if(correct/Math.max(total,1) >= 0.99) spawnConfetti();
+  const pct = Math.round((correct/Math.max(total,1))*100);
+  document.getElementById('app-quiz').innerHTML = `<div class="card" style="text-align:center;max-width:480px;margin:2em auto;">
+    <h2>${opts.quizType==='chapter-exam'?'Chapter Complete!':'Quiz Complete!'}</h2>
+    <div class="result-big">${correct} / ${total}</div>
+    <div class="result-pct">${pct}% · +${xp} XP</div>
+    ${missed.length? `<div style="text-align:left;margin-top:1em;"><strong>Questions missed:</strong>` +
+      missed.map(m=>`<div class="mistake-item">${m.word} — ${m.eng}</div>`).join('') + `</div>` : ''}
+    <button class="btn btn-primary btn-block" id="quizContinue" style="margin-top:1em;">Continue</button>
+  </div>`;
+  document.getElementById('quizContinue').addEventListener('click', ()=>{
+    if(justFinishedLanguage){ renderComplete(lang); showAppScreen('complete'); }
+    else showAppScreen(opts.returnTo||'path');
+  });
+}
+function renderComplete(lang){
+  const profile = currentProfile();
+  spawnConfetti();
+  document.getElementById('app-complete').innerHTML = `<div class="card" style="text-align:center;max-width:500px;margin:2em auto;">
+    <h2>Congratulations! 🎉</h2><p>You\u2019ve completed the LexiLearn beginner path for ${LANGUAGES[lang].name}.</p>
+    <div class="grid-cards" style="text-align:center;">
+      <div class="stat-tile"><strong>${profile.xp}</strong><span>Total XP</span></div>
+      <div class="stat-tile"><strong>${countKnownVocab(profile)}</strong><span>Words Learned</span></div>
+      <div class="stat-tile"><strong>${profile.totalQuestions?Math.round(profile.totalCorrect/profile.totalQuestions*100):0}%</strong><span>Quiz Average</span></div>
+      <div class="stat-tile"><strong>${profile.longestStreak}</strong><span>Longest Streak</span></div>
+    </div>
+    <div style="display:flex;gap:.6em;flex-wrap:wrap;margin-top:1.2em;">
+      <button class="btn btn-outline" data-app-nav="path">Keep Practicing</button>
+      <button class="btn btn-outline" data-app-nav="vocab">Review Vocabulary</button>
+      <button class="btn btn-primary" data-app-nav="language">Start Another Language</button>
+    </div></div>`;
+}
+
+/* ---------------------------------------------------------------
+   5. SCREEN RENDERERS
+   --------------------------------------------------------------- */
+function langCardHTML(code, forLanding){
+  const L = LANGUAGES[code];
+  const grad = `linear-gradient(90deg, ${L.accent[0]}, ${L.accent[1]||L.accent[0]})`;
+  return `<div class="lang-card" data-lang="${code}">
+    <div class="lang-accent" style="background:${grad}"></div>
+    <div class="lang-diff">${L.difficulty}</div>
+    <div class="native" ${L.rtl?'dir="rtl"':''}>${L.native}</div>
+    <div class="eng-name">${L.flag} ${L.name}</div>
+    <p class="lang-desc">${L.desc}</p>
+    <p class="lang-desc"><strong>~${CONTENT[code].chapters.length*3} lessons</strong> in the beginner path</p>
+    <button class="btn btn-primary btn-block" data-select-lang="${code}">${forLanding?'Preview':'Start Learning'}</button>
+  </div>`;
+}
+function renderLandingLangs(){
+  document.getElementById('landingLangGrid').innerHTML = Object.keys(LANGUAGES).map(c=>langCardHTML(c,true)).join('');
+  document.querySelectorAll('#landingLangGrid [data-select-lang]').forEach(b=>b.addEventListener('click', ()=>showAuth('signup')));
+}
+
+function renderScreen(name){
+  const profile = currentProfile(); if(!profile) return;
+  if(name==='language') renderLanguageSelect(profile);
+  else if(name==='dashboard') renderDashboard(profile);
+  else if(name==='path') renderPath(profile);
+  else if(name==='vocab') renderVocab(profile);
+  else if(name==='review') renderReview(profile);
+  else if(name==='quizzes') renderQuizzesHub(profile);
+  else if(name==='achievements') renderAchievements(profile);
+  else if(name==='profile') renderProfile(profile);
+  else if(name==='settings') renderSettings(profile);
+  else if(name==='statistics') renderStatistics(profile);
+}
+
+function renderLanguageSelect(profile){
+  document.getElementById('app-language').innerHTML = `<h2>What language do you want to learn?</h2>
+    <p>Pick one to start — you can explore others any time.</p>
+    <div class="lang-grid">${Object.keys(LANGUAGES).map(c=>langCardHTML(c,false)).join('')}</div>`;
+  document.querySelectorAll('#app-language [data-select-lang]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const code = b.dataset.selectLang;
+      const p = currentProfile();
+      p.currentLanguage = code;
+      p.languages[code].started = true;
+      persist(p);
+      checkAchievements(p); persist(p);
+      showToast(`Now learning ${LANGUAGES[code].name}!`,'success');
+      showAppScreen('dashboard');
+    });
+  });
+}
+
+function renderDashboard(profile){
+  const lang = profile.currentLanguage;
+  if(!lang){ showAppScreen('language'); return; }
+  const L = LANGUAGES[lang]; const PL = profile.languages[lang];
+  const lvl = levelInfo(profile.xp);
+  // find the next unlocked, not-yet-done lesson (or flag that a chapter exam is what's blocking progress)
+  let next=null, needsExamCh=null;
+  for(const ch of CONTENT[lang].chapters){
+    if(isChapterComplete(profile,lang,ch.id)){
+      if(!PL.examsPassed.includes(ch.id)){ needsExamCh = ch; break; }
+      continue;
+    }
+    if(ch.id <= PL.unlockedChapter){ next = {ch, ls: ch.lessons.find(l=>!isLessonDone(profile,lang,ch.id,l.id))}; }
+    break;
+  }
+  const scores = PL.quizScores.slice(-5);
+  const acc = scores.length ? Math.round(scores.reduce((a,s)=>a+s.correct/s.total,0)/scores.length*100) : 0;
+  const dailyDone = profile.dailyChallenge.date === new Date().toISOString().slice(0,10);
+  document.getElementById('app-dashboard').innerHTML = `
+    <div class="dash-hero">
+      <div class="streak-pill">🔥 ${profile.streak} Day Streak</div>
+      <h2>Welcome back!</h2>
+      <div>${L.flag} ${L.name} · Level ${lvl.level}</div>
+      <div class="progress-bar"><div class="progress-bar-fill" style="width:${lvl.pct}%"></div></div>
+      <div style="font-size:.85rem;color:#cfe0ff;">${profile.xp} XP · ${lvl.pct}% to next level</div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Continue Learning</h3>
+        ${next ? `<div class="continue-card">
+            <div><div class="lesson-crumbs">${next.ch.title}</div><div class="lesson-name">${next.ls.title}</div></div>
+            <button class="btn btn-primary" id="btnContinue">Continue →</button></div>`
+          : needsExamCh ? `<div class="continue-card">
+            <div><div class="lesson-crumbs">${needsExamCh.title}</div><div class="lesson-name">Chapter Exam ready</div></div>
+            <button class="btn btn-primary" id="btnContinueExam">Take Exam →</button></div>`
+          : `<p>🎉 You\u2019ve completed every chapter unlocked so far!</p><button class="btn btn-outline" data-app-nav="path">Review the path</button>`}
+      </div>
+      <div class="card">
+        <h3>Today\u2019s Challenge</h3>
+        <p>5 questions · +50 XP</p>
+        <button class="btn ${dailyDone?'btn-outline':'btn-primary'} btn-block" id="btnDaily" ${dailyDone?'disabled':''}>${dailyDone?'Completed today ✓':'Start Challenge'}</button>
+      </div>
+    </div>
+    <div class="grid-cards" style="margin-top:1.2em;">
+      <div class="stat-tile"><strong>${PL.completedLessons.length}</strong><span>Lessons</span></div>
+      <div class="stat-tile"><strong>${allVocabForLang(lang).length}</strong><span>Words in path</span></div>
+      <div class="stat-tile"><strong>${acc}%</strong><span>Recent Accuracy</span></div>
+      <div class="stat-tile"><strong>${profile.achievements.length}/${ACHIEVEMENTS.length}</strong><span>Achievements</span></div>
+    </div>`;
+  if(next) document.getElementById('btnContinue').addEventListener('click', ()=>openLesson(lang, next.ch.id, next.ls.id));
+  if(needsExamCh) document.getElementById('btnContinueExam').addEventListener('click', ()=>startChapterExam(lang, needsExamCh.id));
+  const dailyBtn = document.getElementById('btnDaily');
+  if(dailyBtn && !dailyDone) dailyBtn.addEventListener('click', startDailyChallenge);
+}
+
+function renderPath(profile){
+  const lang = profile.currentLanguage;
+  if(!lang){ showAppScreen('language'); return; }
+  const L = LANGUAGES[lang];
+  let html = `<h2>${L.flag} ${L.name} Learning Path</h2>`;
+  CONTENT[lang].chapters.forEach(ch=>{
+    const examReady = isChapterComplete(profile, lang, ch.id);
+    html += `<div class="chapter-block"><div class="chapter-title">${ch.title}</div><div class="lesson-list">`;
+    ch.lessons.forEach(ls=>{
+      const done = isLessonDone(profile,lang,ch.id,ls.id);
+      const canOpen = isLessonUnlocked(profile,lang,ch.id,ls.id);
+      html += `<div class="lesson-row ${done?'done':canOpen?'current clickable':'locked'}" ${canOpen?`data-open="${ch.id}-${ls.id}"`:''}>
+        <div class="lesson-dot">${done?'✓':canOpen?'▶':'🔒'}</div>
+        <div class="lesson-info"><div class="t">${ls.title}</div><div class="s">${ls.objective}</div></div></div>`;
+    });
+    const examDone = profile.languages[lang].examsPassed.includes(ch.id);
+    html += `<div class="lesson-row ${examDone?'done':examReady?'current clickable':'locked'}" ${examReady?`data-exam="${ch.id}"`:''}>
+      <div class="lesson-dot">${examDone?'✓':examReady?'📝':'🔒'}</div>
+      <div class="lesson-info"><div class="t">Chapter Exam</div><div class="s">${ch.lessons.length*5} questions covering this chapter</div></div></div>`;
+    html += `</div></div>`;
+  });
+  document.getElementById('app-path').innerHTML = html;
+  document.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click', ()=>{
+    const [ch,ls] = el.dataset.open.split('-').map(Number); openLesson(lang, ch, ls);
+  }));
+  document.querySelectorAll('[data-exam]').forEach(el=>el.addEventListener('click', ()=>startChapterExam(lang, Number(el.dataset.exam))));
+}
+
+/* ---- Lesson flow (6 stages) ---- */
+let lessonState = null;
+const STAGES = ['learn','understand','pronounce','practice','sentence','review'];
+function openLesson(lang, chId, lsId){
+  const chapter = CONTENT[lang].chapters.find(c=>c.id===chId);
+  const lesson = chapter.lessons.find(l=>l.id===lsId);
+  lessonState = { lang, chId, lsId, chapter, lesson, stage:0, correct:0, total:0 };
+  showAppScreen('lesson');
+  renderLessonStage();
+}
+function speak(text, lang){
+  const profile = currentProfile();
+  if(!profile.settings.speech){ showToast('Speech is off — turn it on in Settings.'); return; }
+  if(!('speechSynthesis' in window)){ showToast('Speech isn\u2019t supported in this browser.'); return; }
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = LANGUAGES[lang].bcp47;
+  speechSynthesis.cancel(); speechSynthesis.speak(u);
+}
+function lessonProgressDots(){
+  return `<div class="stage-progress">${STAGES.map((s,i)=>`<div class="stage-dot ${i<lessonState.stage?'done':i===lessonState.stage?'active':''}"></div>`).join('')}</div>`;
+}
+function renderLessonStage(){
+  const {lang, lesson, chapter, stage} = lessonState;
+  const box = document.getElementById('app-lesson');
+  const rtl = LANGUAGES[lang].rtl;
+  const header = `<div class="lesson-header"><div><div class="lesson-crumbs">${chapter.title} · ${lesson.title}</div>
+    <h2>${lesson.title}</h2><p>${lesson.objective}</p></div><span class="badge">Step ${stage+1} of ${STAGES.length}</span></div>${lessonProgressDots()}`;
+
+  if(STAGES[stage]==='learn'){
+    box.innerHTML = `<div class="card">${header}<h3>Step 1 · Learn</h3>
+      ${lesson.vocab.map(w=>`<div class="vocab-teach-card"><div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="word ${rtl?'rtl-word':''}" ${rtl?'dir="rtl"':''}>${w.word}</span>
+        <button class="speak-btn" data-say="${encodeURIComponent(w.word)}">🔊</button></div>
+        <div class="translation">${w.eng}</div><div class="pron">Pronounced: ${w.pron}</div>
+        <div class="example" ${rtl?'dir="rtl"':''}>${w.example}</div></div>`).join('')}
+      <div class="lesson-actions"><span></span><button class="btn btn-primary" id="stageNext">Continue →</button></div></div>`;
+    box.querySelectorAll('[data-say]').forEach(b=>b.addEventListener('click',()=>speak(decodeURIComponent(b.dataset.say), lang)));
+  }
+  else if(STAGES[stage]==='understand'){
+    box.innerHTML = `<div class="card">${header}<h3>Step 2 · Understand</h3>
+      <div class="explain-box"><strong>${lesson.grammar.title}</strong><p style="margin:.5em 0 0;color:inherit;">${lesson.grammar.body}</p></div>
+      ${lesson.vocab.slice(0,2).map(w=>`<div class="vocab-teach-card"><div class="word ${rtl?'rtl-word':''}" ${rtl?'dir="rtl"':''}>${w.word}</div>
+        <div class="translation">Meaning: ${w.eng}</div><div class="pron">Usage: seen in “${w.example}”</div></div>`).join('')}
+      <div class="lesson-actions"><span></span><button class="btn btn-primary" id="stageNext">Continue →</button></div></div>`;
+  }
+  else if(STAGES[stage]==='pronounce'){
+    box.innerHTML = `<div class="card">${header}<h3>Step 3 · Pronunciation</h3><p>Tap 🔊 to hear each word (uses your browser\u2019s built-in speech).</p>
+      ${lesson.vocab.map(w=>`<div class="vocab-teach-card"><div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="word ${rtl?'rtl-word':''}" ${rtl?'dir="rtl"':''}>${w.word}</span>
+        <button class="speak-btn" data-say="${encodeURIComponent(w.word)}">🔊</button></div>
+        <div class="pron">Pronounced approximately: <strong>${w.pron}</strong></div></div>`).join('')}
+      <div class="lesson-actions"><span></span><button class="btn btn-primary" id="stageNext">Continue →</button></div></div>`;
+    box.querySelectorAll('[data-say]').forEach(b=>b.addEventListener('click',()=>speak(decodeURIComponent(b.dataset.say), lang)));
+  }
+  else if(STAGES[stage]==='practice' || STAGES[stage]==='review'){
+    const isReview = STAGES[stage]==='review';
+    const wide = allVocabForLang(lang);
+    const qCount = isReview ? 3 : 3;
+    const qs = buildQuestionsFromVocab(lesson.vocab, wide, qCount, null);
+    renderInlineQuestions(box, header, isReview?'Step 6 · Mini Review':'Step 4 · Practice', qs, rtl, ()=>{
+      lessonState.stage++; renderLessonStage();
+    });
+  }
+  else if(STAGES[stage]==='sentence'){
+    const q = buildQuestionsFromVocab([], [], 0, lesson.sentence)[0];
+    renderInlineQuestions(box, header, 'Step 5 · Build a Sentence', [q], rtl, ()=>{
+      lessonState.stage++; renderLessonStage();
+    });
+  }
+  if(box.querySelector('#stageNext')) box.querySelector('#stageNext').addEventListener('click', ()=>{ lessonState.stage++; renderLessonStage(); });
+  if(lessonState.stage >= STAGES.length) renderLessonComplete();
+}
+// Renders one or more inline questions within the lesson card, tallying correct/total on lessonState.
+function renderInlineQuestions(box, header, stepLabel, questions, rtl, onDone){
+  let idx=0, localCorrect=0;
+  function draw(){
+    if(idx>=questions.length){ lessonState.correct+=localCorrect; lessonState.total+=questions.length; onDone(); return; }
+    const q = questions[idx];
+    let body;
+    if(q.type==='mcq'){
+      body = `<div class="option-list" dir="${rtl?'rtl':'ltr'}">${q.options.map(o=>`<button class="option-item" data-val="${encodeURIComponent(o)}">${o}</button>`).join('')}</div><div id="fb"></div>`;
+    } else {
+      body = `<div class="sentence-bank" id="bank" dir="${rtl?'rtl':'ltr'}">${q.bank.map((w,i)=>`<button class="word-chip" data-i="${i}">${w}</button>`).join('')}</div>
+              <div class="sentence-chosen" id="chosen" dir="${rtl?'rtl':'ltr'}"></div>
+              <button class="btn btn-primary" id="checkSentence">Check</button><div id="fb"></div>`;
+    }
+    box.innerHTML = `<div class="card">${header}<h3>${stepLabel} (${idx+1}/${questions.length})</h3><p>${q.prompt}</p>${body}
+      <div class="lesson-actions"><span></span><button class="btn btn-primary" id="qNext" style="display:none">${idx===questions.length-1?'Finish':'Next'} →</button></div></div>`;
+    if(q.type==='mcq'){
+      box.querySelectorAll('.option-item').forEach(btn=>btn.addEventListener('click',()=>{
+        const val = decodeURIComponent(btn.dataset.val);
+        box.querySelectorAll('.option-item').forEach(b=>{ b.disabled=true; if(decodeURIComponent(b.dataset.val)===q.correct) b.classList.add('correct'); else if(b===btn) b.classList.add('incorrect'); });
+        const ok = val===q.correct; if(ok) localCorrect++;
+        document.getElementById('fb').innerHTML = `<div class="explain-box ${ok?'right':'wrong'}">${ok?'✅ Correct! ':'❌ '}${q.explanation}</div>`;
+        document.getElementById('qNext').style.display='inline-flex';
+      }));
+    } else {
+      let chosen=[]; const bankEl=box.querySelector('#bank'), chosenEl=box.querySelector('#chosen');
+      bankEl.querySelectorAll('.word-chip').forEach(chip=>chip.addEventListener('click',()=>{
+        if(chip.classList.contains('picked')) return;
+        chip.classList.add('picked'); chosen.push({i:chip.dataset.i,w:chip.textContent});
+        const c=document.createElement('button'); c.className='word-chip placed'; c.textContent=chip.textContent; c.dataset.i=chip.dataset.i;
+        c.addEventListener('click',()=>{ chosen=chosen.filter(x=>x.i!==c.dataset.i); bankEl.querySelector(`.word-chip[data-i="${c.dataset.i}"]`).classList.remove('picked'); c.remove(); });
+        chosenEl.appendChild(c);
+      }));
+      box.querySelector('#checkSentence').addEventListener('click',()=>{
+        const words = chosen.map(x=>x.w); const ok = JSON.stringify(words)===JSON.stringify(q.answer);
+        if(ok) localCorrect++;
+        document.getElementById('fb').innerHTML = `<div class="explain-box ${ok?'right':'wrong'}">${ok?'✅ Correct!':'❌ Correct order: “'+q.answer.join(' ')+'”'}</div>`;
+        document.getElementById('qNext').style.display='inline-flex';
+        box.querySelector('#checkSentence').disabled=true; bankEl.querySelectorAll('.word-chip').forEach(b=>b.disabled=true);
+      });
+    }
+    box.querySelector('#qNext').addEventListener('click', ()=>{ idx++; draw(); });
+  }
+  draw();
+}
+function renderLessonComplete(){
+  const {lang, chId, lsId, correct, total} = lessonState;
+  const profile = completeLesson(lang, chId, lsId, correct, total);
+  document.getElementById('app-lesson').innerHTML = `<div class="card" style="text-align:center;max-width:460px;margin:2em auto;">
+    <h2>Lesson Complete! 🎉</h2><div class="result-big">+25 XP</div>
+    <p>Great work — you\u2019re one step further into ${LANGUAGES[lang].name}.</p>
+    <button class="btn btn-primary btn-block" id="lessonContinue">Continue</button></div>`;
+  document.getElementById('lessonContinue').addEventListener('click', ()=>showAppScreen('path'));
+}
+function startChapterExam(lang, chId){
+  const chapter = CONTENT[lang].chapters.find(c=>c.id===chId);
+  const vocabScope = chapter.lessons.flatMap(l=>l.vocab);
+  const wide = allVocabForLang(lang);
+  const qs = buildQuestionsFromVocab(vocabScope, wide, 10, chapter.lessons[0].sentence);
+  startQuiz(lang, qs, {title:`${chapter.title} Exam`, quizType:'chapter-exam', chapterId:chId, xpMode:'flat', flatXP:200, returnTo:'path'});
+}
+
+function startDailyChallenge(){
+  const profile = currentProfile();
+  const lang = profile.currentLanguage;
+  const done = CONTENT[lang].chapters.flatMap(c=>c.lessons).filter(l=>isLessonDone(profile,lang,
+    CONTENT[lang].chapters.find(c=>c.lessons.includes(l)).id, l.id));
+  const scope = done.length ? done.flatMap(l=>l.vocab) : CONTENT[lang].chapters[0].lessons[0].vocab;
+  const wide = allVocabForLang(lang);
+  const qs = buildQuestionsFromVocab(scope, wide, 5, null);
+  startQuiz(lang, qs, {title:'Daily Challenge', quizType:'daily', xpMode:'flat', flatXP:50, returnTo:'dashboard'});
+}
+// wrap finishQuiz side-effect for daily challenge date-lock (kept simple & explicit)
+const _finishQuiz = finishQuiz;
+finishQuiz = function(){
+  const wasDaily = quizState.opts.quizType==='daily';
+  _finishQuiz();
+  if(wasDaily){
+    const profile = currentProfile();
+    profile.dailyChallenge.date = new Date().toISOString().slice(0,10);
+    profile.dailyChallengesCompleted = (profile.dailyChallengesCompleted||0)+1;
+    checkAchievements(profile);
+    persist(profile);
+  }
+};
+
+function renderVocab(profile){
+  const lang = profile.currentLanguage; if(!lang){ showAppScreen('language'); return; }
+  const pool = allVocabForLang(lang);
+  const cats = ['All', ...new Set(pool.map(w=>w.category))];
+  const status = profile.languages[lang].vocabStatus;
+  function draw(filter){
+    const items = filter==='All' ? pool : pool.filter(w=>w.category===filter);
+    document.getElementById('app-vocab').innerHTML = `<h2>${LANGUAGES[lang].flag} ${LANGUAGES[lang].name} Vocabulary</h2>
+      <div class="vocab-filters">${cats.map(c=>`<button class="chip-filter ${c===filter?'active':''}" data-cat="${c}">${c}</button>`).join('')}</div>
+      <div class="flash-grid">${items.map((w,i)=>`<div class="flashcard" data-i="${i}" data-word="${encodeURIComponent(w.word)}">
+        <div class="front" ${LANGUAGES[lang].rtl?'dir="rtl"':''}>${w.word}</div>
+        <div class="back"><strong>${w.eng}</strong><br>${w.pron}<br><em>${w.example}</em></div>
+        <div class="flash-actions"><button class="hard" data-mark="hard">Hard</button><button class="easy" data-mark="easy">Easy</button></div></div>`).join('')}</div>`;
+    document.querySelectorAll('#app-vocab .chip-filter').forEach(b=>b.addEventListener('click',()=>draw(b.dataset.cat)));
+    document.querySelectorAll('#app-vocab .flashcard').forEach(card=>{
+      card.addEventListener('click', (e)=>{ if(e.target.dataset.mark) return; card.classList.toggle('flipped'); });
+      card.querySelectorAll('[data-mark]').forEach(btn=>btn.addEventListener('click',(e)=>{
+        e.stopPropagation();
+        const word = decodeURIComponent(card.dataset.word);
+        const p = currentProfile(); p.languages[lang].vocabStatus[word]=btn.dataset.mark; checkAchievements(p); persist(p);
+        showToast(btn.dataset.mark==='easy' ? 'Marked easy ✓' : 'We\u2019ll review this again soon');
+      }));
+    });
+  }
+  draw('All');
+}
+
+function renderReview(profile){
+  const lang = profile.currentLanguage; if(!lang){ showAppScreen('language'); return; }
+  const mistakes = profile.languages[lang].mistakes;
+  document.getElementById('app-review').innerHTML = `<h2>Review</h2>
+    <div class="card"><h3>Words You Struggled With — ${LANGUAGES[lang].name}</h3>
+    ${mistakes.length ? mistakes.map(m=>`<div class="mistake-item"><strong ${LANGUAGES[lang].rtl?'dir="rtl"':''}>${m.word}</strong> — ${m.eng}</div>`).join('')
+      : '<p>No tricky words yet — keep learning and we\u2019ll track what needs review.</p>'}
+    </div>
+    <div class="card" style="margin-top:1em;"><h3>Quick Review</h3><p>A 5-question practice session based on your recent mistakes.</p>
+    <button class="btn btn-primary" id="btnQuickReview">Start Quick Review</button></div>`;
+  document.getElementById('btnQuickReview').addEventListener('click', ()=>{
+    const wide = allVocabForLang(lang);
+    const scope = mistakes.length ? mistakes.map(m=>({word:m.word,eng:m.eng,pron:m.pron,example:'',category:''})) : sample(wide,5);
+    const qs = buildQuestionsFromVocab(scope, wide, 5, null);
+    startQuiz(lang, qs, {title:'Quick Review', quizType:'review', xpMode:'perCorrect', perCorrectXP:5, returnTo:'review'});
+  });
+}
+
+function renderQuizzesHub(profile){
+  const lang = profile.currentLanguage; if(!lang){ showAppScreen('language'); return; }
+  let html = `<h2>Quizzes — ${LANGUAGES[lang].name}</h2><div class="grid-cards">`;
+  CONTENT[lang].chapters.forEach(ch=>{
+    const examReady = isChapterComplete(profile, lang, ch.id);
+    const passed = profile.languages[lang].examsPassed.includes(ch.id);
+    html += `<div class="card"><h3>${ch.title}</h3><p>${ch.lessons.length} lessons · Chapter exam ${passed?'passed ✓':examReady?'available':'complete all lessons first'}</p>
+      <button class="btn ${examReady?'btn-primary':'btn-outline'} btn-block" data-exam="${ch.id}" ${examReady?'':'disabled'}>Take Chapter Exam</button></div>`;
+  });
+  html += `</div>`;
+  document.getElementById('app-quizzes').innerHTML = html;
+  document.querySelectorAll('[data-exam]').forEach(b=>b.addEventListener('click',()=>startChapterExam(lang, Number(b.dataset.exam))));
+}
+
+function renderAchievements(profile){
+  document.getElementById('app-achievements').innerHTML = `<h2>Achievements</h2>
+    <div class="ach-grid">${ACHIEVEMENTS.map(a=>{
+      const unlocked = profile.achievements.includes(a.id);
+      return `<div class="ach-card ${unlocked?'unlocked':''}"><div class="ach-icon">${unlocked?a.icon:'🔒'}</div><h4>${a.name}</h4><p>${a.desc}</p></div>`;
+    }).join('')}</div>`;
+}
+
+function renderProfile(profile){
+  const lvl = levelInfo(profile.xp);
+  const totalQuizzes = profile.totalQuizzes;
+  const avgAcc = profile.totalQuestions ? Math.round(profile.totalCorrect/profile.totalQuestions*100) : 0;
+  const username = currentUsername();
+  document.getElementById('app-profile').innerHTML = `<h2>Profile</h2>
+    <div class="card grid-cards">
+      <div><strong>Username</strong><p>${username}</p></div>
+      <div><strong>Email</strong><p>${profile.email||'—'}</p></div>
+      <div><strong>Language</strong><p>${profile.currentLanguage?LANGUAGES[profile.currentLanguage].name:'Not selected'}</p></div>
+      <div><strong>Level</strong><p>${lvl.level} · ${profile.xp} XP</p></div>
+      <div><strong>Streak</strong><p>🔥 ${profile.streak} days (best ${profile.longestStreak})</p></div>
+      <div><strong>Lessons completed</strong><p>${profile.totalLessonsCompleted}</p></div>
+      <div><strong>Quizzes taken</strong><p>${totalQuizzes}</p></div>
+      <div><strong>Average score</strong><p>${avgAcc}%</p></div>
+      <div><strong>Achievements</strong><p>${profile.achievements.length} / ${ACHIEVEMENTS.length}</p></div>
+    </div>
+    <div class="card" style="margin-top:1em;display:flex;gap:.6em;flex-wrap:wrap;">
+      <button class="btn btn-outline" id="btnChangeName">Change Username</button>
+      <button class="btn btn-outline" data-app-nav="language">Change Language</button>
+      <button class="btn btn-danger" id="btnResetProgress">Reset Progress</button>
+    </div>`;
+  document.getElementById('btnChangeName').addEventListener('click', ()=>{
+    const nn = prompt('New username (display only):', username);
+    if(nn && nn.trim()){ showToast('Username updated for this session.'); document.querySelectorAll('.brand small').forEach(()=>{}); renderProfile(currentProfile()); }
+  });
+  document.getElementById('btnResetProgress').addEventListener('click', ()=>{
+    openModal(`<div class="card"><h3>Reset all progress?</h3><p>This clears XP, streaks, lessons, quizzes and achievements. This can\u2019t be undone.</p>
+      <div style="display:flex;gap:.6em;"><button class="btn btn-outline btn-block" id="cancelReset">Cancel</button>
+      <button class="btn btn-danger btn-block" id="confirmReset">Reset</button></div></div>`);
+    document.getElementById('cancelReset').addEventListener('click', closeModal);
+    document.getElementById('confirmReset').addEventListener('click', ()=>{
+      const fresh = defaultProfile(profile.email); persist(fresh); closeModal(); showToast('Progress reset.'); showAppScreen('language');
+    });
+  });
+}
+
+function renderSettings(profile){
+  const s = profile.settings;
+  document.getElementById('app-settings').innerHTML = `<h2>Settings</h2><div class="card">
+    <div class="settings-row"><span>Dark mode</span><button class="switch ${s.darkMode?'on':''}" data-set="darkMode"></button></div>
+    <div class="settings-row"><span>Sound effects</span><button class="switch ${s.sound?'on':''}" data-set="sound"></button></div>
+    <div class="settings-row"><span>Speech pronunciation</span><button class="switch ${s.speech?'on':''}" data-set="speech"></button></div>
+    <div class="settings-row"><span>Animations</span><button class="switch ${s.animations?'on':''}" data-set="animations"></button></div>
+    </div>
+    <div class="card" style="margin-top:1em;display:flex;gap:.6em;flex-wrap:wrap;">
+      <button class="btn btn-outline" id="stResetProgress">Reset Progress</button>
+      <button class="btn btn-danger" id="stResetAccount">Delete Account</button>
+      <button class="btn btn-ghost" id="stLogout">Log Out</button>
+    </div>`;
+  document.querySelectorAll('#app-settings [data-set]').forEach(btn=>btn.addEventListener('click', ()=>{
+    const p = currentProfile(); p.settings[btn.dataset.set] = !p.settings[btn.dataset.set]; persist(p);
+    applySettings(p.settings); renderSettings(p);
+  }));
+  document.getElementById('stResetProgress').addEventListener('click', ()=>{ renderProfile(profile); showAppScreen('profile'); document.getElementById('btnResetProgress').click(); });
+  document.getElementById('stResetAccount').addEventListener('click', ()=>{
+    openModal(`<div class="card"><h3>Delete this demo account?</h3><p>This removes your local account and all its data from this browser.</p>
+      <div style="display:flex;gap:.6em;"><button class="btn btn-outline btn-block" id="cancelDel">Cancel</button><button class="btn btn-danger btn-block" id="confirmDel">Delete</button></div></div>`);
+    document.getElementById('cancelDel').addEventListener('click', closeModal);
+    document.getElementById('confirmDel').addEventListener('click', ()=>{
+      const u = currentUsername(); const users = loadUsers(); delete users[u.toLowerCase()]; saveUsers(users);
+      localStorage.removeItem('lexi_data_'+u); clearSession(); closeModal(); location.reload();
+    });
+  });
+  document.getElementById('stLogout').addEventListener('click', doLogout);
+}
+
+function renderStatistics(profile){
+  const lvl = levelInfo(profile.xp);
+  const acc = profile.totalQuestions ? Math.round(profile.totalCorrect/profile.totalQuestions*100) : 0;
+  const chaptersDone = Object.values(profile.languages).reduce((a,l)=>a+l.examsPassed.length,0);
+  const hrs = Math.round(profile.totalTimeSeconds/360)/10;
+  document.getElementById('app-statistics').innerHTML = `<h2>Your Statistics</h2><div class="grid-cards">
+    <div class="stat-tile"><strong>${profile.xp}</strong><span>Total XP</span></div>
+    <div class="stat-tile"><strong>${profile.totalLessonsCompleted}</strong><span>Lessons Completed</span></div>
+    <div class="stat-tile"><strong>${acc}%</strong><span>Quiz Accuracy</span></div>
+    <div class="stat-tile"><strong>${countKnownVocab(profile)}</strong><span>Words Learned</span></div>
+    <div class="stat-tile"><strong>${chaptersDone}</strong><span>Chapters Completed</span></div>
+    <div class="stat-tile"><strong>🔥 ${profile.streak}</strong><span>Current Streak</span></div>
+    <div class="stat-tile"><strong>${profile.longestStreak}</strong><span>Longest Streak</span></div>
+    <div class="stat-tile"><strong>${hrs}h</strong><span>Time Learning</span></div>
+    </div>`;
+}
+
+/* ---------------------------------------------------------------
+   6. NAVIGATION, AUTH, EVENTS
+   --------------------------------------------------------------- */
+function showToast(msg, type){
+  const box = document.getElementById('toastBox');
+  const t = document.createElement('div');
+  t.className = 'card'; t.style.cssText = `padding:.8em 1.2em;margin-top:.5em;box-shadow:var(--shadow);border-left:4px solid ${type==='success'?'var(--success)':'var(--blue-500)'};animation:fadeIn .2s ease;`;
+  t.textContent = msg;
+  box.appendChild(t);
+  setTimeout(()=>{ t.style.transition='opacity .4s'; t.style.opacity='0'; setTimeout(()=>t.remove(),400); }, 2600);
+}
+function showXPFloat(amount, evt){
+  const el = document.createElement('div'); el.className='xp-float'; el.textContent = `+${amount} XP`;
+  el.style.left = (evt && evt.clientX ? evt.clientX : window.innerWidth-120)+'px';
+  el.style.top = (evt && evt.clientY ? evt.clientY : 80)+'px';
+  document.body.appendChild(el); setTimeout(()=>el.remove(), 1000);
+}
+function spawnConfetti(){
+  const colors=['#3f7de0','#5b93ef','#1f9d63','#d9932b','#0a1b33'];
+  for(let i=0;i<28;i++){
+    const c=document.createElement('div'); c.className='confetti';
+    c.style.left = Math.random()*100+'vw'; c.style.background = colors[i%colors.length];
+    c.style.animationDelay = (Math.random()*0.4)+'s';
+    document.body.appendChild(c); setTimeout(()=>c.remove(),2500);
+  }
+}
+function openModal(html){ document.getElementById('modalRoot').innerHTML = `<div style="position:fixed;inset:0;background:rgba(10,20,40,.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:1em;">${html}</div>`; }
+function closeModal(){ document.getElementById('modalRoot').innerHTML=''; }
+
+function applySettings(settings){
+  document.documentElement.setAttribute('data-theme', settings.darkMode ? 'dark' : 'light');
+  document.documentElement.classList.toggle('no-anim', !settings.animations);
+}
+
+function showAppScreen(name){
+  document.querySelectorAll('.app-screen').forEach(s=>s.classList.remove('active'));
+  const el = document.getElementById('app-'+name); if(el) el.classList.add('active');
+  document.querySelectorAll('[data-app-nav]').forEach(n=>n.classList.toggle('active', n.dataset.appNav===name));
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  const p = currentProfile();
+  if(p && p.currentLanguage) document.getElementById('topbarLang').textContent = `${LANGUAGES[p.currentLanguage].flag} ${LANGUAGES[p.currentLanguage].name}`;
+  renderScreen(name);
+  window.scrollTo(0,0);
+}
+
+function enterApp(){
+  document.getElementById('screen-landing').classList.remove('active');
+  document.getElementById('screen-auth').classList.remove('active');
+  document.getElementById('appShell').classList.add('active');
+  const profile = currentProfile();
+  applySettings(profile.settings);
+  showAppScreen(profile.currentLanguage ? 'dashboard' : 'language');
+}
+function showLanding(){
+  document.getElementById('appShell').classList.remove('active');
+  document.getElementById('screen-auth').classList.remove('active');
+  document.getElementById('screen-landing').classList.add('active');
+}
+function showAuth(tab){
+  document.getElementById('appShell').classList.remove('active');
+  document.getElementById('screen-landing').classList.remove('active');
+  document.getElementById('screen-auth').classList.add('active');
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+  document.querySelectorAll('.auth-form').forEach(f=>f.classList.toggle('active', f.id===tab+'Form'));
+}
+
+function doLogout(){ clearSession(); showLanding(); }
+
+function createDemoUser(){
+  const uname = 'demo';
+  const users = loadUsers();
+  if(!users[uname]) users[uname] = {username:'demo', email:'demo@lexilearn.app', password:'demo'};
+  saveUsers(users);
+  let profile = loadData(uname);
+  if(profile.totalLessonsCompleted===0){
+    profile.currentLanguage='it'; profile.languages.it.started=true;
+    profile = completeLessonSilently(profile,'it',1,1);
+    profile = completeLessonSilently(profile,'it',1,2);
+    profile.xp += 130; profile.streak=3; profile.longestStreak=5; profile.lastActiveDate=new Date().toISOString().slice(0,10);
+    checkAchievements(profile);
+    saveData(uname, profile);
+  }
+  setSession(uname, true);
+  enterApp();
+}
+function completeLessonSilently(profile, lang, chId, lsId){
+  profile.languages[lang].completedLessons.push(chId+'-'+lsId);
+  profile.totalLessonsCompleted++;
+  return profile;
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  renderLandingLangs();
+
+  // top-level nav
+  document.querySelectorAll('[data-nav]').forEach(b=>b.addEventListener('click', ()=>{
+    const target = b.dataset.nav;
+    if(target==='landing') showLanding();
+    else if(target==='auth-login') showAuth('login');
+    else if(target==='auth-signup') showAuth('signup');
+  }));
+  document.getElementById('btnTryDemo').addEventListener('click', createDemoUser);
+  document.getElementById('btnTryDemo2').addEventListener('click', createDemoUser);
+
+  // auth tabs
+  document.querySelectorAll('.auth-tab').forEach(t=>t.addEventListener('click', ()=>showAuth(t.dataset.tab)));
+
+  // password visibility
+  document.querySelectorAll('.pw-toggle').forEach(btn=>btn.addEventListener('click', ()=>{
+    const input = document.getElementById(btn.dataset.target);
+    const show = input.type==='password'; input.type = show?'text':'password'; btn.textContent = show?'Hide':'Show';
+  }));
+
+  // signup
+  document.getElementById('signupForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const username = document.getElementById('suUsername').value.trim();
+    const email = document.getElementById('suEmail').value.trim();
+    const password = document.getElementById('suPassword').value;
+    const err = document.getElementById('signupError'); err.textContent='';
+    const users = loadUsers();
+    const key = username.toLowerCase();
+    if(users[key]){ err.textContent = 'That username is already taken.'; return; }
+    if(Object.values(users).some(u=>u.email.toLowerCase()===email.toLowerCase())){ err.textContent='That email is already registered.'; return; }
+    users[key] = {username, email, password};
+    saveUsers(users);
+    saveData(username, defaultProfile(email));
+    setSession(username, true);
+    showToast('Account created — welcome to LexiLearn!','success');
+    enterApp();
+  });
+
+  // login
+  document.getElementById('loginForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const id = document.getElementById('loginId').value.trim();
+    const pw = document.getElementById('loginPw').value;
+    const remember = document.getElementById('loginRemember').checked;
+    const err = document.getElementById('loginError'); err.textContent='';
+    const users = loadUsers();
+    let match = users[id.toLowerCase()];
+    if(!match) match = Object.values(users).find(u=>u.email.toLowerCase()===id.toLowerCase());
+    if(!match || match.password!==pw){ err.textContent='Incorrect username/email or password.'; return; }
+    setSession(match.username, remember);
+    enterApp();
+  });
+
+  // app nav (sidebar + bottom bar + any dynamically-rendered nav buttons, e.g. inside
+  // Profile's "Change Language" or the dashboard/complete screens — delegated so it
+  // keeps working no matter when the button was added to the DOM)
+  document.addEventListener('click', (e)=>{
+    const navBtn = e.target.closest('[data-app-nav]');
+    if(navBtn) showAppScreen(navBtn.dataset.appNav);
+  });
+  document.getElementById('btnLogout').addEventListener('click', doLogout);
+  document.getElementById('hamburgerBtn').addEventListener('click', ()=>document.getElementById('sidebar').classList.toggle('mobile-open'));
+
+  // search
+  const searchInput = document.getElementById('searchInput');
+  searchInput.addEventListener('input', ()=>{
+    const q = searchInput.value.trim().toLowerCase();
+    const results = document.getElementById('searchResults');
+    if(!q){ results.classList.remove('active'); results.innerHTML=''; return; }
+    let html='';
+    Object.keys(LANGUAGES).forEach(code=>{
+      const hit = allVocabForLang(code).find(w=>w.eng.toLowerCase().includes(q) || w.word.toLowerCase().includes(q));
+      if(hit) html += `<div class="search-result-item">${LANGUAGES[code].flag} <b>${LANGUAGES[code].name}</b>: <span ${LANGUAGES[code].rtl?'dir="rtl"':''}>${hit.word}</span> — ${hit.eng}</div>`;
+    });
+    if(!html) html = '<div class="search-result-item">No matches found.</div>';
+    results.innerHTML = html; results.classList.add('active');
+  });
+  document.addEventListener('click',(e)=>{ if(!e.target.closest('.search-wrap')) document.getElementById('searchResults').classList.remove('active'); });
+
+  // resume session
+  const session = getSession();
+  if(session && loadUsers()[session.username?.toLowerCase()]){ enterApp(); }
+  else if(session){ /* stale session pointing at deleted user */ clearSession(); showLanding(); }
+  else showLanding();
+});
+
+</script>
+</body>
+</html>
